@@ -55,6 +55,26 @@ Course grade = weighted average of component scores; components with no
 authored items are excluded and weights renormalized. Letter grades / GPA use
 the standard 4.0 scale in `status.go`.
 
+## Authoring coursework — read the playbook first
+
+Before creating or modifying ANY course content (lessons, explorations,
+assignments, quizzes, finals), read `.claude/skills/author-course/SKILL.md`
+(invocable as `/author-course`). It contains the full recipes, the golden
+exemplars to copy, the twist catalog, and the verification protocol.
+Non-negotiable gates, restated here because they must never be skipped:
+
+1. Reference-solve every test suite in the scratchpad to 100% before
+   handing it to the student. Never commit solutions or filled-in
+   predictions.
+2. Dry-run every item (`uni grade --dry`, `uni quiz --dry`) — starters run
+   clean and red; quiz keys score exactly 100% (verify via piped answers).
+3. Quiz answers exist in the repo only as salted hashes (`uni hash`);
+   plaintext keys never appear in files or commit messages.
+4. Never write to `progress/` — it is the student's transcript. Graders
+   run with `--dry` always.
+5. New lessons start from `docs/authoring/templates/lesson.html` and keep
+   its CSS verbatim.
+
 ## Authoring conventions (agreed with the student)
 
 - **Reading materials are HTML, not markdown**: each lesson is a
