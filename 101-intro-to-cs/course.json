@@ -1,0 +1,35 @@
+{
+  "id": "101",
+  "title": "Introduction to Computer Science",
+  "content_complete": false,
+  "components": [
+    {"type": "exploration", "weight": 0.10},
+    {"type": "quiz", "weight": 0.20},
+    {"type": "assignment", "weight": 0.45},
+    {"type": "final", "weight": 0.25}
+  ],
+  "items": [
+    {
+      "id": "explore-01",
+      "type": "exploration",
+      "title": "Lesson 1 explorations (predict-run-verify)",
+      "path": "lessons/01-computation/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "q1",
+      "type": "quiz",
+      "title": "Quiz 1 — Computation and Algorithms",
+      "path": "quizzes/q1.json"
+    },
+    {
+      "id": "a1",
+      "type": "assignment",
+      "title": "First Algorithms",
+      "path": "assignments/a1-first-algorithms",
+      "runner": "python-unittest",
+      "tests_dir": "tests"
+    }
+  ]
+}

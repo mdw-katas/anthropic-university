@@ -14,6 +14,20 @@ For an experienced engineer, the value here is vocabulary and formality — the
 precise definitions (state, expression, side effect, invariant, complexity)
 that later courses assume without ceremony. Expect to move quickly.
 
+## Grading
+
+Components and weights (see `course.json`; pass bar 80%, best score kept):
+
+| Component     | Weight | How it's graded                                     |
+|---------------|--------|-----------------------------------------------------|
+| Explorations  | 10%    | predict-run-verify self-checks: `uni grade 101/...` |
+| Quizzes       | 20%    | interactive, retakeable: `uni quiz 101/...`         |
+| Assignments   | 45%    | kata-style test suites: `uni grade 101/...`         |
+| Final project | 25%    | graded like an assignment                           |
+
+Lessons live in `lessons/` — open each lesson's `index.html` in a browser,
+then work its `explore/` scripts. `uni next` always knows what's next.
+
 ## Learning Objectives
 
 By the end of this course you will be able to:

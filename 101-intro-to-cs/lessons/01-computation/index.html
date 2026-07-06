@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 101 · Lesson 1 — What Is Computation?</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button {
+    font: inherit; font-family: -apple-system, sans-serif; cursor: pointer;
+    background: var(--accent); color: var(--bg); border: none; border-radius: 6px;
+    padding: .4rem 1rem; margin-right: .5rem;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .widget table { border-collapse: collapse; margin-top: .75rem; width: 100%;
+    font-family: ui-monospace, Menlo, monospace; font-size: .9rem; }
+  .widget th, .widget td { border: 1px solid var(--border); padding: .3rem .7rem; text-align: right; }
+  .widget .now { background: var(--accent); color: var(--bg); }
+  .footnote { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 101 · Introduction to Computer Science · Lesson 1</p>
+<h1>What Is Computation?</h1>
+
+<p>You have shipped software for sixteen years, so you have <em>done</em>
+computation daily. This lesson asks the question you were never forced to
+answer precisely: what is the thing you were doing?</p>
+
+<h2>1. Algorithms, precisely</h2>
+
+<p>An <strong>algorithm</strong> is a finite, unambiguous, effective procedure
+that transforms input into output. Each word is load-bearing:</p>
+
+<ul>
+  <li><strong>Finite</strong> — it terminates. A procedure that may run forever
+      is not (yet) an algorithm for the problem.</li>
+  <li><strong>Unambiguous</strong> — each step has exactly one meaning; no step
+      requires judgment or taste.</li>
+  <li><strong>Effective</strong> — each step is mechanically executable: a
+      person with pencil and paper could do it, however slowly.</li>
+</ul>
+
+<p>Notice what is <em>not</em> in the definition: computers. Algorithms predate
+them by millennia. The definition's most famous citizen is more than 2,300
+years old.</p>
+
+<h2>2. A worked classic: Euclid's algorithm</h2>
+
+<p>To find the greatest common divisor of two positive integers: repeatedly
+replace the larger with the remainder of dividing larger by smaller, until one
+of them is zero. The other is the GCD.</p>
+
+<pre><code>def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a</code></pre>
+
+<p>Step through it below. Watch the pair <code>(a, b)</code> — that pair is the
+algorithm's entire <em>state</em>, an idea we define next.</p>
+
+<div class="card widget" id="euclid">
+  <label>a: <input type="number" id="euclid-a" value="1071" min="1" style="width:6em"></label>
+  <label>b: <input type="number" id="euclid-b" value="462" min="0" style="width:6em"></label>
+  <button id="euclid-reset" class="secondary">reset</button>
+  <button id="euclid-step">step</button>
+  <button id="euclid-run" class="secondary">run to completion</button>
+  <table>
+    <thead><tr><th>step</th><th>a</th><th>b</th><th>a mod b</th></tr></thead>
+    <tbody id="euclid-body"></tbody>
+  </table>
+  <p id="euclid-verdict" class="footnote"></p>
+</div>
+
+<details class="card predict">
+  <summary>Predict before you peek: how many steps for gcd(8, 13)?</summary>
+  <p>Six: (8,13) → (13,8) → (8,5) → (5,3) → (3,2) → (2,1) → (1,0).
+  Consecutive Fibonacci numbers are Euclid's worst case — a fact that, in
+  CS 301, becomes a proof that the algorithm runs in logarithmic time.</p>
+</details>
+
+<h2>3. State: the noun your program is</h2>
+
+<p>The <strong>state</strong> of a running program is everything it would take
+to freeze it and later resume it perfectly: the values of all variables plus
+the position in the code. In the stepper above, the whole state fits in one
+table row. Every bug you have ever fixed was a discrepancy between the state
+you believed and the state that was.</p>
+
+<p>A <strong>state machine</strong> is the simplest model of computation: a
+finite set of states, and rules for moving between them on each input. A
+traffic light. A regex engine. A TCP connection. CS 370 will prove exactly
+what this humble model can and cannot compute.</p>
+
+<h2>4. The stored-program idea</h2>
+
+<p>The founding insight of modern computing (von Neumann, 1945, building on
+Turing, 1936): <strong>a program is just data in the same memory as any other
+data</strong>. Numbers that encode instructions. The consequences are the
+industry you work in:</p>
+
+<ul>
+  <li>Programs can read programs — so compilers, linters, and formatters can exist.</li>
+  <li>Programs can write programs — so code generators and, lately, large
+      language models can exist.</li>
+  <li>Programs can <em>be</em> wrong data — so buffer-overflow exploits can exist.</li>
+</ul>
+
+<h2>5. A first taste of cost</h2>
+
+<p>Two algorithms can be equally correct and unequally usable. Count the
+<em>steps</em>, not the seconds: checking every pair in a list of
+<code>n</code> items costs about <code>n²</code> steps; scanning it once costs
+<code>n</code>; Euclid's remainders shrink so fast the cost is closer to
+<code>log n</code>. This instinct — asking <em>how does cost grow as input
+grows?</em> — is the discipline's sharpest tool, formalized in CS 201/301.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — in <code>explore/</code> next to this file.
+Open each <code>ex*.py</code>, fill in your <code>PREDICT_*</code> answers
+<em>before</em> running anything, then run the script to see the truth, and
+finally <code>uni grade 101/explore-01</code> to record your calibration.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/tutorial/introduction.html">The official Python tutorial, §3</a> — the language used in this course, from the source.</li>
+  <li><a href="https://pythontutor.com/">Python Tutor</a> — paste any exploration script and watch its state evolve step by step; the single best companion tool for this course.</li>
+  <li><a href="https://go.dev/blog/">For later</a> — bookmark nothing else yet; depth beats breadth in week one.</li>
+</ul>
+
+<script>
+(function () {
+  const aInput = document.getElementById('euclid-a');
+  const bInput = document.getElementById('euclid-b');
+  const body = document.getElementById('euclid-body');
+  const verdict = document.getElementById('euclid-verdict');
+  let a = 0, b = 0, step = 0;
+  function reset() {
+    a = Math.max(1, Math.floor(Number(aInput.value) || 1));
+    b = Math.max(0, Math.floor(Number(bInput.value) || 0));
+    step = 0;
+    body.innerHTML = '';
+    verdict.textContent = '';
+    render(false);
+  }
+  function render(done) {
+    const row = document.createElement('tr');
+    const mod = b === 0 ? '—' : String(a % b);
+    row.innerHTML = '<td>' + step + '</td><td>' + a + '</td><td>' + b + '</td><td>' + mod + '</td>';
+    if (!done) row.querySelectorAll('td').forEach(td => td.classList.add('now'));
+    body.querySelectorAll('.now').forEach(td => td.classList.remove('now'));
+    body.appendChild(row);
+  }
+  function stepOnce() {
+    if (b === 0) {
+      verdict.textContent = 'Done: gcd = ' + a + ' in ' + step + ' step(s). The state stopped changing — that is what "halting" means.';
+      return false;
+    }
+    [a, b] = [b, a % b];
+    step++;
+    render(false);
+    if (b === 0) return stepOnce(), false;
+    return true;
+  }
+  document.getElementById('euclid-reset').addEventListener('click', reset);
+  document.getElementById('euclid-step').addEventListener('click', stepOnce);
+  document.getElementById('euclid-run').addEventListener('click', function () {
+    let guard = 0;
+    while (stepOnce() && guard++ < 1000) {}
+  });
+  aInput.addEventListener('change', reset);
+  bInput.addEventListener('change', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

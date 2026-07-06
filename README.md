@@ -57,5 +57,24 @@ load-bearing for the CS coursework.
 | 7        | 410, 420, 430      |
 | 8        | 440, 490           |
 
-Each course folder contains a `README.md` syllabus. Readings, assignments,
-quizzes, and exams will be added later, course by course.
+Each course folder contains a `README.md` syllabus. Course content (lessons,
+assignments, quizzes) is authored course by course.
+
+## Tooling
+
+The `uni` CLI (Go, in `tools/uni/`) is registrar, grader, and advisor:
+
+```
+make build        # build ./bin/uni
+make test         # test the tooling itself
+make status       # degree dashboard        (uni status)
+make next         # what to work on next    (uni next)
+
+uni status 101            # standing within one course
+uni grade 101/a1          # run an item's tests, record the score
+uni quiz 101/q1           # take a quiz interactively
+```
+
+Progress lives in `progress/` as committed JSON — git history is the
+transcript. Pass bar is 80%; only your best score counts; quizzes are
+retakeable.

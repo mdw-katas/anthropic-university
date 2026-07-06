@@ -1,0 +1,27 @@
+{
+  "degree": "Anthropic University — B.S. Computer Science",
+  "pass_bar": 0.8,
+  "courses": [
+    {"id": "101", "dir": "101-intro-to-cs", "title": "Introduction to Computer Science", "credits": 3, "prerequisites": []},
+    {"id": "102", "dir": "102-program-design", "title": "Program Design and Abstraction", "credits": 3, "prerequisites": ["101"]},
+    {"id": "110", "dir": "110-math-foundations", "title": "Mathematical Foundations", "credits": 3, "prerequisites": []},
+    {"id": "120", "dir": "120-discrete-mathematics", "title": "Discrete Mathematics", "credits": 3, "prerequisites": ["110"]},
+    {"id": "201", "dir": "201-data-structures", "title": "Data Structures", "credits": 3, "prerequisites": ["102", "120"]},
+    {"id": "210", "dir": "210-computer-architecture", "title": "Computer Organization and Architecture", "credits": 3, "prerequisites": ["102"]},
+    {"id": "220", "dir": "220-systems-programming", "title": "Systems Programming in C and Unix", "credits": 3, "prerequisites": ["210"]},
+    {"id": "240", "dir": "240-linear-algebra", "title": "Linear Algebra", "credits": 3, "prerequisites": ["110"]},
+    {"id": "301", "dir": "301-algorithms", "title": "Design and Analysis of Algorithms", "credits": 3, "prerequisites": ["201"]},
+    {"id": "310", "dir": "310-operating-systems", "title": "Operating Systems", "credits": 3, "prerequisites": ["220"]},
+    {"id": "320", "dir": "320-computer-networks", "title": "Computer Networks", "credits": 3, "prerequisites": ["220"]},
+    {"id": "330", "dir": "330-databases", "title": "Database Systems", "credits": 3, "prerequisites": ["201"]},
+    {"id": "340", "dir": "340-programming-languages", "title": "Programming Languages", "credits": 3, "prerequisites": ["201"]},
+    {"id": "350", "dir": "350-software-engineering", "title": "Software Engineering", "credits": 3, "prerequisites": ["201"]},
+    {"id": "360", "dir": "360-probability-statistics", "title": "Probability and Statistics", "credits": 3, "prerequisites": ["110"]},
+    {"id": "370", "dir": "370-theory-of-computation", "title": "Theory of Computation", "credits": 3, "prerequisites": ["120"]},
+    {"id": "410", "dir": "410-compilers", "title": "Compiler Construction", "credits": 3, "prerequisites": ["340", "370"]},
+    {"id": "420", "dir": "420-distributed-systems", "title": "Distributed Systems", "credits": 3, "prerequisites": ["310", "320"]},
+    {"id": "430", "dir": "430-machine-learning", "title": "Machine Learning", "credits": 3, "prerequisites": ["240", "360"]},
+    {"id": "440", "dir": "440-deep-learning", "title": "Deep Learning and Large Language Models", "credits": 3, "prerequisites": ["430"]},
+    {"id": "490", "dir": "490-capstone", "title": "Senior Capstone Project", "credits": 6, "prerequisites": []}
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "q1",
+  "title": "Quiz 1 — Computation and Algorithms",
+  "questions": [
+    {
+      "id": "q1-1",
+      "prompt": "Which is the most precise definition of an algorithm?",
+      "choices": [
+        "Any program a computer can run",
+        "A finite, unambiguous, effective procedure that transforms input into output",
+        "A mathematical formula expressed in code",
+        "A flowchart describing a process"
+      ],
+      "salt": "101.q1.1",
+      "answer_hash": "eb7dc40b085b41ab95353a01a1ebd73a66284abe02c7de6fccefa3235688278b"
+    },
+    {
+      "id": "q1-2",
+      "prompt": "Running Euclid's algorithm, gcd(1071, 462) equals:",
+      "choices": ["3", "7", "21", "147"],
+      "salt": "101.q1.2",
+      "answer_hash": "671dc8f4670c8c38807f1a47cd77b3b4d0145a61360186f224e627fcfa1c40ca"
+    },
+    {
+      "id": "q1-3",
+      "prompt": "The 'state' of a running program is best described as:",
+      "choices": [
+        "Its source code",
+        "The values of all its variables plus its current position in the code",
+        "The output it has printed so far",
+        "The contents of the CPU's instruction set"
+      ],
+      "salt": "101.q1.3",
+      "answer_hash": "07d0957e10891a92379564c1e87093f4b0418446a513abb78823dbe9c56d719a"
+    },
+    {
+      "id": "q1-4",
+      "prompt": "Why is the stored-program concept foundational?",
+      "choices": [
+        "Programs live in memory as data, so programs can read, write, and be treated as programs/data interchangeably",
+        "It makes programs execute faster than hardwired logic",
+        "It guarantees programs cannot be modified at runtime",
+        "It reduces the amount of memory computers need"
+      ],
+      "salt": "101.q1.4",
+      "answer_hash": "299045a15a4ddcc5e3b3df1540474412087030e024af9d2f1a1f0a02cc5168c0"
+    },
+    {
+      "id": "q1-5",
+      "prompt": "An algorithm that examines every pair of items in a list of n items performs roughly how many steps?",
+      "choices": ["n", "n²", "log n", "a constant number"],
+      "salt": "101.q1.5",
+      "answer_hash": "b246d28c18e875a27c00cc904b9d0bc8dad2c623c74219ca0b2138f2ea2e4262"
+    },
+    {
+      "id": "q1-6",
+      "prompt": "A procedure is deterministic when:",
+      "choices": [
+        "The same input always produces the same steps and the same result",
+        "It is guaranteed to terminate on every input",
+        "It produces output without using randomness anywhere in the universe",
+        "It runs in polynomial time"
+      ],
+      "salt": "101.q1.6",
+      "answer_hash": "86ff064aa71a8aa4f0b394ae1cfa4d10037e6edbee638ae7d55d30a2d5f4b0e7"
+    }
+  ]
+}
