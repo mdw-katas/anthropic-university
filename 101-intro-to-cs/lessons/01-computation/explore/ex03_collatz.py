@@ -12,9 +12,37 @@ Fill in predictions, run this file to check, then:
 uni grade 101/explore-01
 """
 
-PREDICT_STEPS_FOR_6 = None
-PREDICT_CHAMPION_UNDER_10 = None  # the n in 1..10 with the most steps
+PREDICT_STEPS_FOR_6 = 8
+PREDICT_CHAMPION_UNDER_10 = 9  # the n in 1..10 with the most steps
 
+"""
+n: 6
+steps: 0
+
+n: 3
+steps: 1
+
+n: 10
+steps: 2
+
+n: 5
+steps: 3
+
+n: 16
+steps: 4
+
+n: 8
+steps: 5
+
+n:4
+steps: 6
+
+n: 2
+steps: 7
+
+n: 1
+steps: 8
+"""
 
 def collatz_steps(n):
     steps = 0
