@@ -1,0 +1,80 @@
+{
+  "id": "q3",
+  "title": "Quiz 3 — Recursion and Collections (Lessons 5–6)",
+  "questions": [
+    {
+      "id": "q3-1",
+      "prompt": "Every correct recursive function needs:",
+      "choices": [
+        "memoization",
+        "a base case, plus recursive calls that make progress toward it",
+        "at most one recursive call",
+        "a global depth counter"
+      ],
+      "salt": "101.q3.1",
+      "answer_hash": "41fc55546b1d5d44f638d1e070ad30f3551ffbf9bfd8ed8395eec8d9572d21de"
+    },
+    {
+      "id": "q3-2",
+      "prompt": "Naive recursive Fibonacci is catastrophically slow because:",
+      "choices": [
+        "it recomputes the same subproblems exponentially many times",
+        "stack frames are expensive to allocate",
+        "Python lacks tail-call optimization",
+        "integer arithmetic slows down for big numbers"
+      ],
+      "salt": "101.q3.2",
+      "answer_hash": "875dcdb6b368d3c9f97b2109baa5365cb32a76b7e244292f125e331577b6e8de"
+    },
+    {
+      "id": "q3-3",
+      "prompt": "Python's RecursionError is a guard against:",
+      "choices": [
+        "infinite while loops",
+        "memory leaks",
+        "unbounded call-stack growth",
+        "arithmetic overflow"
+      ],
+      "salt": "101.q3.3",
+      "answer_hash": "504ea2a5c0dc15af157b45568c57f3d28e2d249e6c8fd5bdeebaf8a1616fff36"
+    },
+    {
+      "id": "q3-4",
+      "prompt": "a = [1, 2]; b = a; b.append(3) — what is a?",
+      "choices": ["[1, 2]", "[1, 2, 3]", "a TypeError was raised", "implementation-defined"],
+      "salt": "101.q3.4",
+      "answer_hash": "7e150f92fa6da30606b054e562f06055341daf445527b66f8d374833f863ca9c"
+    },
+    {
+      "id": "q3-5",
+      "prompt": "The essential difference between a tuple and a list:",
+      "choices": [
+        "tuples are immutable (fixed arrows; usable as dict keys)",
+        "tuples keep their elements sorted",
+        "tuples deep-copy their contents",
+        "tuples may not contain mutable elements"
+      ],
+      "salt": "101.q3.5",
+      "answer_hash": "e7e54f9dae673259e0d1daab283c411b0eb37d75f3100372ba098a23eefa4aea"
+    },
+    {
+      "id": "q3-6",
+      "prompt": "d = {\"x\": 1} — what does d.get(\"y\", 0) do?",
+      "choices": [
+        "raises KeyError",
+        "returns None",
+        "returns 0, the supplied default",
+        "inserts \"y\": 0 into d and returns 0"
+      ],
+      "salt": "101.q3.6",
+      "answer_hash": "b91f6bba5a35123b32af26b69670839991f786db34e88dc52fe685c771333847"
+    },
+    {
+      "id": "q3-7",
+      "prompt": "[n * n for n in range(4)] equals:",
+      "choices": ["[1, 4, 9, 16]", "[0, 1, 4, 9]", "[0, 1, 2, 3]", "[1, 2, 3, 4]"],
+      "salt": "101.q3.7",
+      "answer_hash": "1f17a7168c79a32539775cc71a7419956898f41e94f83b930a3fbf63776724da"
+    }
+  ]
+}

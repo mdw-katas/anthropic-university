@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 101 · Lesson 6 — Collections, Mutability, Aliasing</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button {
+    font: inherit; font-family: -apple-system, sans-serif; cursor: pointer;
+    background: var(--accent); color: var(--bg); border: none; border-radius: 6px;
+    padding: .4rem 1rem; margin: .2rem .4rem .2rem 0;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .diagram { display: flex; gap: 3rem; margin: 1rem 0; align-items: flex-start; }
+  .names, .objects { display: flex; flex-direction: column; gap: .6rem; }
+  .name { font-family: ui-monospace, Menlo, monospace; padding: .3rem .7rem;
+    border: 1px dashed var(--border); border-radius: 6px; }
+  .object { font-family: ui-monospace, Menlo, monospace; padding: .4rem .8rem;
+    border: 2px solid var(--accent); border-radius: 8px; }
+  .narr { font-family: ui-monospace, Menlo, monospace; font-size: .9rem; white-space: pre-wrap; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: .4rem .8rem; text-align: left; }
+  th { font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 101 · Introduction to Computer Science · Lesson 6</p>
+<h1>Collections, Mutability, and Aliasing</h1>
+
+<p>Lesson 2 promised that "names bound to values" would eventually bite.
+This is the lesson where it bites — and where Python's four workhorse
+collections earn precise job descriptions.</p>
+
+<h2>1. The cast</h2>
+
+<table>
+  <tr><th>Type</th><th>Shape</th><th>Mutable?</th><th>Reach for it when…</th></tr>
+  <tr><td><code>list</code></td><td>ordered sequence</td><td>yes</td><td>order matters; contents change</td></tr>
+  <tr><td><code>tuple</code></td><td>ordered sequence</td><td><strong>no</strong></td><td>a fixed-shape record; a dict key</td></tr>
+  <tr><td><code>dict</code></td><td>key → value mapping</td><td>yes</td><td>lookup by name/id — the workhorse</td></tr>
+  <tr><td><code>set</code></td><td>unordered unique items</td><td>yes</td><td>membership tests; deduplication</td></tr>
+</table>
+
+<p>All four are covered by the same half-open slicing and iteration idioms
+you already use. What's new here is not syntax — it is the semantics of
+<em>sharing</em>.</p>
+
+<h2>2. Aliasing: one value, many names</h2>
+
+<p>Assignment never copies. <code>b = a</code> binds a second name to the
+<em>same</em> value. For immutable values that's harmless. For mutable ones,
+a change through either name is visible through both — they are
+<strong>aliases</strong>:</p>
+
+<div class="card widget" id="alias">
+  <button id="alias-share">b = a</button>
+  <button id="alias-copy">b = a.copy()</button>
+  <button id="alias-mutate" class="secondary">a.append(4)</button>
+  <button id="alias-reset" class="secondary">reset</button>
+  <div class="diagram">
+    <div class="names" id="alias-names"></div>
+    <div class="objects" id="alias-objects"></div>
+  </div>
+  <div class="narr" id="alias-narr"></div>
+</div>
+
+<p>Every "function mysteriously modified my list" bug is this diagram.
+Parameters alias their arguments: pass a list to a function, and the
+function's parameter is another name for <em>your</em> list. Mutating it
+mutates yours. This is also the full explanation of Lesson 4's mutable
+default trap: one list, created at <code>def</code> time, aliased by every
+call forever.</p>
+
+<details class="card predict">
+  <summary>Predict: <code>t = ([1, 2], "x")</code> — does
+  <code>t[0].append(3)</code> succeed?</summary>
+  <p>Yes. The <em>tuple</em> is immutable: it will forever hold that same
+  list and that same string. But the list it holds is still a list.
+  Immutability is one level deep — a tuple is a fixed set of arrows, not a
+  freezer.</p>
+</details>
+
+<h2>3. Copies, shallow and deep</h2>
+
+<pre><code>b = a.copy()            # new list, same element objects (shallow)
+import copy
+b = copy.deepcopy(a)    # recursively copies nested mutables too</code></pre>
+
+<p>Shallow is usually what you want and cheap; deep is for nested structures
+you intend to fork wholesale. Knowing which one a bug needs is a rite of
+passage.</p>
+
+<h2>4. Dicts and sets: the O(1) family</h2>
+
+<p>Dicts and sets are hash tables (CS 201 opens the hood). Practical
+consequences today: membership and lookup take roughly constant time —
+compared to a list's front-to-back scan — and their keys/elements must be
+immutable (hashable): strings, numbers, tuples yes; lists no.</p>
+
+<pre><code>counts = {}
+for word in words:
+    counts[word] = counts.get(word, 0) + 1   # the counting idiom</code></pre>
+
+<p>Comprehensions round out the toolkit — expression-shaped loops:</p>
+
+<pre><code>squares = [n * n for n in range(10)]
+evens   = {n for n in numbers if n % 2 == 0}
+by_id   = {user.id: user for user in users}</code></pre>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: aliasing through a
+function boundary, tuple "immutability", dict counting. Then
+<code>uni grade 101/explore-06</code>.</p>
+<p><strong>Assignment a4 — Word Stats</strong> is now open: a small text
+analyzer built on dicts and lists. <code>uni grade 101/a4</code>.
+<strong>Quiz 3</strong> (lessons 5–6): <code>uni quiz 101/q3</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/tutorial/datastructures.html">Python tutorial §5: Data Structures</a>.</li>
+  <li><a href="https://pythontutor.com/">Python Tutor</a> — its arrows-to-boxes diagrams are literally this lesson's widget, generalized.</li>
+</ul>
+
+<script>
+(function () {
+  let shared = true, a = [1, 2, 3], b = a, narr = 'b = a: two names, ONE list.';
+  function reset() { shared = true; a = [1, 2, 3]; b = a; narr = 'reset: b = a again — two names, one list.'; render(); }
+  function render() {
+    const names = document.getElementById('alias-names');
+    const objects = document.getElementById('alias-objects');
+    names.innerHTML = ''; objects.innerHTML = '';
+    ['a', 'b'].forEach(label => {
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = label + ' ──▶' + (shared ? ' (same list)' : label === 'a' ? ' list #1' : ' list #2');
+      names.appendChild(name);
+    });
+    (shared ? [a] : [a, b]).forEach(value => {
+      const object = document.createElement('div');
+      object.className = 'object';
+      object.textContent = '[' + value.join(', ') + ']';
+      objects.appendChild(object);
+    });
+    document.getElementById('alias-narr').textContent =
+      narr + '\na == ' + JSON.stringify(a) + '   b == ' + JSON.stringify(b);
+  }
+  document.getElementById('alias-share').addEventListener('click', () => {
+    shared = true; b = a; narr = 'b = a: aliases. Mutations through either name show through both.'; render();
+  });
+  document.getElementById('alias-copy').addEventListener('click', () => {
+    shared = false; b = a.slice(); narr = 'b = a.copy(): a NEW list with the same contents. Futures diverge.'; render();
+  });
+  document.getElementById('alias-mutate').addEventListener('click', () => {
+    a.push(a.length + 1);
+    narr = shared ? 'a.append(...): and b saw it happen — same list.'
+                  : 'a.append(...): b is unmoved — separate lists.';
+    render();
+  });
+  document.getElementById('alias-reset').addEventListener('click', reset);
+  render();
+})();
+</script>
+</body>
+</html>

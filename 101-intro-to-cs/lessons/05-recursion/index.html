@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 101 · Lesson 5 — Recursion</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .tree details { margin-left: 1.1rem; font-family: ui-monospace, Menlo, monospace;
+    font-size: .9rem; }
+  .tree summary { cursor: pointer; }
+  .tree .leaf { margin-left: 2.4rem; color: var(--muted); }
+  .widget .totals { font-family: ui-monospace, Menlo, monospace; font-size: .9rem;
+    margin-top: .6rem; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 101 · Introduction to Computer Science · Lesson 5</p>
+<h1>Recursion</h1>
+
+<p>A recursive function solves a problem by calling itself on a
+<em>smaller</em> version of the same problem. That single idea underlies
+parsers, file-system walkers, sorting algorithms, and the tree-shaped half of
+computer science. It is also just Lesson 3's termination argument and MATH
+120's induction, wearing a third costume.</p>
+
+<h2>1. The two obligations</h2>
+
+<pre><code>def factorial(n):
+    if n == 0:            # 1. BASE CASE: an answer with no self-call
+        return 1
+    return n * factorial(n - 1)   # 2. PROGRESS: strictly smaller input</code></pre>
+
+<p>Every correct recursion discharges both: a base case that answers
+directly, and recursive calls that make measurable progress toward it. Miss
+either and you get Python's <code>RecursionError</code> — the interpreter's
+guard rail (default: ~1000 frames) against unbounded stack growth, each
+frame being exactly the stack frame from Lesson 4.</p>
+
+<h2>2. Trust the contract</h2>
+
+<p>The mental shift that makes recursion easy: when writing
+<code>factorial(n)</code>, do <strong>not</strong> trace into
+<code>factorial(n - 1)</code>. Assume it works — it satisfies its contract —
+and ask only: <em>given a correct answer for n-1, is my answer for n
+right?</em> That assumption is not faith; it is the induction hypothesis, and
+MATH 120 will let you prove it legitimate. Tracing into recursive calls is
+how recursion stays hard; contract thinking is how it becomes routine.</p>
+
+<h2>3. The shape of the calls</h2>
+
+<p>One self-call makes a chain (factorial). Two make a <em>tree</em> — and
+trees can explode. Naive Fibonacci recomputes the same subproblems
+exponentially many times. Expand the call tree yourself; every duplicated
+subtree is wasted work:</p>
+
+<div class="card widget tree" id="fibtree">
+  <div id="fib-root"></div>
+  <div class="totals" id="fib-totals"></div>
+  <p class="footnote">fib(2) appears three times in fib(5)'s tree. Dynamic
+  programming — CS 301 — is the art of computing each subproblem once. One
+  dict of remembered answers turns 15 calls into 6.</p>
+</div>
+
+<details class="card predict">
+  <summary>Predict: how deep does factorial(5)'s stack get, counting
+  factorial frames only?</summary>
+  <p>Six frames at the deepest moment: factorial(5) through factorial(0), all
+  live simultaneously while factorial(0) computes. Depth is the cost
+  recursion pays for its elegance — a chain of n calls needs O(n) stack.</p>
+</details>
+
+<h2>4. Recursion ⇄ iteration</h2>
+
+<p>Anything iterative can be written recursively and vice versa — the two are
+formally equivalent (CS 370 territory). Practically: Python does not optimize
+tail calls, so linear chains (factorial, sum-of-list) are usually better as
+loops; <em>tree-shaped</em> problems (nested data, divide and conquer, file
+trees) are where recursion is the honest notation and iteration requires
+managing an explicit stack by hand — which is assignment a5's punchline,
+one lesson early.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: count fib's calls,
+measure recursion depth, predict a string reversal. Then
+<code>uni grade 101/explore-05</code>.</p>
+<p><strong>Assignment a3 — Recursion</strong> is now open, with a twist: the
+test suite parses your source and <em>rejects loops</em>. Recursion only.
+<code>uni grade 101/a3</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/library/sys.html#sys.setrecursionlimit">sys.setrecursionlimit</a> — the guard rail, officially documented.</li>
+  <li><a href="https://pythontutor.com/">Python Tutor</a> — run fib(4) and watch the tree unfold frame by frame; genuinely worth ten minutes.</li>
+</ul>
+
+<script>
+(function () {
+  let calls = 0;
+  function build(n) {
+    calls++;
+    const node = document.createElement(n <= 1 ? 'div' : 'details');
+    if (n <= 1) {
+      node.className = 'leaf';
+      node.textContent = 'fib(' + n + ') = ' + n + '   (base case)';
+      return node;
+    }
+    const summary = document.createElement('summary');
+    summary.textContent = 'fib(' + n + ')  — click to expand its two calls';
+    node.appendChild(summary);
+    node.appendChild(build(n - 1));
+    node.appendChild(build(n - 2));
+    return node;
+  }
+  const root = document.getElementById('fib-root');
+  root.appendChild(build(5));
+  document.getElementById('fib-totals').textContent =
+    'Total calls in this tree: ' + calls + ' — for fib(5). fib(30) would make 2,692,537.';
+})();
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "id": "101",
   "title": "Introduction to Computer Science",
-  "content_complete": false,
+  "content_complete": true,
   "components": [
     {"type": "exploration", "weight": 0.10},
     {"type": "quiz", "weight": 0.20},
@@ -28,6 +28,120 @@
       "type": "assignment",
       "title": "First Algorithms",
       "path": "assignments/a1-first-algorithms",
+      "runner": "python-unittest",
+      "tests_dir": "tests"
+    },
+    {
+      "id": "explore-02",
+      "type": "exploration",
+      "title": "Lesson 2 explorations (values & types)",
+      "path": "lessons/02-values-and-types/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "explore-03",
+      "type": "exploration",
+      "title": "Lesson 3 explorations (control flow)",
+      "path": "lessons/03-control-flow/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "a2",
+      "type": "assignment",
+      "title": "Control Flow",
+      "path": "assignments/a2-control-flow",
+      "runner": "python-unittest",
+      "tests_dir": "tests"
+    },
+    {
+      "id": "explore-04",
+      "type": "exploration",
+      "title": "Lesson 4 explorations (functions & scope)",
+      "path": "lessons/04-functions/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "q2",
+      "type": "quiz",
+      "title": "Quiz 2 — Values, Control Flow, Functions",
+      "path": "quizzes/q2.json"
+    },
+    {
+      "id": "explore-05",
+      "type": "exploration",
+      "title": "Lesson 5 explorations (recursion)",
+      "path": "lessons/05-recursion/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "a3",
+      "type": "assignment",
+      "title": "Recursion (no loops allowed)",
+      "path": "assignments/a3-recursion",
+      "runner": "python-unittest",
+      "tests_dir": "tests"
+    },
+    {
+      "id": "explore-06",
+      "type": "exploration",
+      "title": "Lesson 6 explorations (collections & aliasing)",
+      "path": "lessons/06-collections/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "a4",
+      "type": "assignment",
+      "title": "Word Stats",
+      "path": "assignments/a4-word-stats",
+      "runner": "python-unittest",
+      "tests_dir": "tests"
+    },
+    {
+      "id": "q3",
+      "type": "quiz",
+      "title": "Quiz 3 — Recursion and Collections",
+      "path": "quizzes/q3.json"
+    },
+    {
+      "id": "explore-07",
+      "type": "exploration",
+      "title": "Lesson 7 explorations (modules & debugging)",
+      "path": "lessons/07-organizing-and-debugging/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "a5",
+      "type": "assignment",
+      "title": "Stack Calculator",
+      "path": "assignments/a5-stack-calculator",
+      "runner": "python-unittest",
+      "tests_dir": "tests"
+    },
+    {
+      "id": "explore-08",
+      "type": "exploration",
+      "title": "Lesson 8 explorations (efficiency)",
+      "path": "lessons/08-efficiency/explore",
+      "runner": "python-unittest",
+      "tests_dir": "."
+    },
+    {
+      "id": "q4",
+      "type": "quiz",
+      "title": "Quiz 4 — Programs, Efficiency, and the Field",
+      "path": "quizzes/q4.json"
+    },
+    {
+      "id": "final",
+      "type": "final",
+      "title": "Final Project — mdtable",
+      "path": "final/mdtable",
       "runner": "python-unittest",
       "tests_dir": "tests"
     }

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 101 · Lesson 8 — Informal Efficiency</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget input[type=range] { width: 100%; }
+  .race { font-family: ui-monospace, Menlo, monospace; font-size: .85rem; }
+  .race .row { display: grid; grid-template-columns: 7rem 1fr 9rem; gap: .6rem;
+    align-items: center; margin: .3rem 0; }
+  .race .bar { height: .9rem; background: var(--accent); border-radius: 4px; min-width: 2px; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem;
+    font-family: ui-monospace, Menlo, monospace; }
+  th, td { border: 1px solid var(--border); padding: .35rem .8rem; text-align: right; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 101 · Introduction to Computer Science · Lesson 8</p>
+<h1>Informal Efficiency: Counting Steps</h1>
+
+<p>The question that separates engineering from hoping: <em>what happens to
+the cost when the input grows?</em> This lesson builds the instinct
+informally; CS 201 and CS 301 will formalize it as big-O. The instinct is
+90% of the daily value.</p>
+
+<h2>1. Count steps, not seconds</h2>
+
+<p>Seconds depend on the machine, the load, the phase of the moon. Steps —
+how many times the loop body runs — depend only on the algorithm and the
+input size <code>n</code>. So we count steps, keep only the dominant term,
+and drop constant factors: <code>3n² + 10n + 7</code> is "about n²",
+because for large <code>n</code> the n² term is the whole story.</p>
+
+<h2>2. The growth families</h2>
+
+<table>
+  <tr><th>growth</th><th>n=10</th><th>n=1,000</th><th>n=1,000,000</th><th>smells like</th></tr>
+  <tr><td>log n</td><td>3</td><td>10</td><td>20</td><td style="text-align:left">halving: binary search</td></tr>
+  <tr><td>n</td><td>10</td><td>1,000</td><td>1,000,000</td><td style="text-align:left">one pass: scan, sum, max</td></tr>
+  <tr><td>n log n</td><td>33</td><td>10,000</td><td>20,000,000</td><td style="text-align:left">good sorting</td></tr>
+  <tr><td>n²</td><td>100</td><td>1,000,000</td><td>10¹²</td><td style="text-align:left">all pairs: nested loops</td></tr>
+  <tr><td>2ⁿ</td><td>1,024</td><td>~10³⁰¹</td><td>—</td><td style="text-align:left">all subsets: brute force</td></tr>
+</table>
+
+<p>Read the n=1,000,000 column and the industry's architecture decisions
+explain themselves. Race them yourself:</p>
+
+<div class="card widget">
+  <label>n = <span id="race-n">100</span></label>
+  <input type="range" id="race-slider" min="1" max="60" value="20">
+  <div class="race" id="race-rows"></div>
+  <p class="footnote">Bars are log-scaled (each doubling adds equal length) —
+  on a linear scale, everything but the leader would be invisible.</p>
+</div>
+
+<h2>3. Where steps hide</h2>
+
+<p>The loop you wrote is not the only loop that runs. Two famous ambushes:</p>
+
+<pre><code>if name in huge_list:        # a LOOP in disguise: scans the whole list, ~n steps
+if name in huge_set:         # hash lookup: ~constant. Same syntax!
+
+total = ""
+for part in parts:           # looks linear...
+    total += part            # ...but rebuilds the string each time: ~n² total
+"".join(parts)               # linear. The idiom exists for a reason.</code></pre>
+
+<p>The instinct to develop: for every innocent-looking operation, ask
+<em>"and what does that cost?"</em> — especially membership tests, string
+concatenation, and anything inside a loop that touches a collection.</p>
+
+<details class="card predict">
+  <summary>Predict: your a1 binary search on a million sorted items — about
+  how many elements does it examine?</summary>
+  <p>About 20 (2²⁰ ≈ 1,048,576). That's the probe test's secret: it allowed
+  60 accesses on 10,000 items, generous headroom over the ~14 a real binary
+  search needs, and hopeless for a 10,000-step scan.</p>
+</details>
+
+<h2>4. When n² is fine</h2>
+
+<p>Honesty clause: for n = 50, n² is 2,500 steps — nothing. Clarity beats
+cleverness until <code>n</code> is large or the code is hot, and
+<em>measured</em> beats <em>assumed</em> always (profilers arrive in CS 220).
+The sin is not writing a quadratic loop; it is not <em>knowing</em> you did.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: count nested-loop
+steps, watch list-vs-set membership, size up binary search. Then
+<code>uni grade 101/explore-08</code>.</p>
+<p><strong>Quiz 4</strong> (lessons 7–9) and the <strong>final project</strong>
+unlock after Lesson 9 — one more reading to go.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/library/timeit.html">timeit — official docs</a> — measure small snippets honestly.</li>
+  <li><a href="https://wiki.python.org/moin/TimeComplexity">Python operation costs (python.org wiki)</a> — the official cheat sheet of what list/dict/set operations cost.</li>
+</ul>
+
+<script>
+(function () {
+  const slider = document.getElementById('race-slider');
+  const label = document.getElementById('race-n');
+  const rows = document.getElementById('race-rows');
+  const racers = [
+    { name: 'log n', steps: n => Math.max(1, Math.log2(n)) },
+    { name: 'n', steps: n => n },
+    { name: 'n log n', steps: n => n * Math.max(1, Math.log2(n)) },
+    { name: 'n²', steps: n => n * n },
+    { name: '2ⁿ', steps: n => Math.pow(2, Math.min(n, 1023)) },
+  ];
+  function pretty(x) {
+    if (!isFinite(x)) return 'astronomical';
+    if (x >= 1e15) return x.toExponential(1);
+    return Math.round(x).toLocaleString();
+  }
+  function render() {
+    const n = Math.round(Math.pow(10, slider.value / 10));
+    label.textContent = n.toLocaleString();
+    rows.innerHTML = '';
+    const worst = Math.log2(racers[racers.length - 1].steps(n) + 2);
+    racers.forEach(racer => {
+      const steps = racer.steps(n);
+      const row = document.createElement('div');
+      row.className = 'row';
+      const width = Math.max(1, 100 * Math.log2(steps + 2) / worst);
+      row.innerHTML = '<span>' + racer.name + '</span>' +
+        '<div><div class="bar" style="width:' + width + '%"></div></div>' +
+        '<span>' + pretty(steps) + '</span>';
+      rows.appendChild(row);
+    });
+  }
+  slider.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

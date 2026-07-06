@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 101 · Lesson 9 — A Tour of the Field</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em;
+    background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: .8rem; margin: 1.5rem 0; }
+  .map details { background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: .8rem 1rem; }
+  .map summary { cursor: pointer; font-weight: 650;
+    font-family: -apple-system, sans-serif; font-size: .95rem; }
+  .map .q { font-style: italic; margin: .5rem 0; }
+  .map .c { color: var(--muted); font-size: .85rem;
+    font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 101 · Introduction to Computer Science · Lesson 9</p>
+<h1>A Tour of the Field</h1>
+
+<p>Eight lessons ago, computation was defined without mentioning computers.
+This closing lesson maps the territory the rest of your degree explores. Each
+area of computer science is, at heart, <strong>one stubborn question</strong>
+pursued for decades. Click each region of the map; together they are your
+transcript-to-be.</p>
+
+<div class="map">
+  <details><summary>Architecture</summary>
+    <div class="q">"How do you build a machine that computes anything?"</div>
+    <div class="c">CS 210 → CS 220. From transistors to your process's memory
+    layout. Where 'the stored-program idea' stops being a slogan.</div>
+  </details>
+  <details><summary>Operating Systems</summary>
+    <div class="q">"How do you share one machine among many untrusting programs?"</div>
+    <div class="c">CS 310. Virtualization, concurrency, persistence — the
+    illusions your servers stand on.</div>
+  </details>
+  <details><summary>Networks</summary>
+    <div class="q">"How do machines that share nothing cooperate anyway?"</div>
+    <div class="c">CS 320 → CS 420. Layered protocols, and then the hard
+    part: partial failure.</div>
+  </details>
+  <details><summary>Data &amp; Databases</summary>
+    <div class="q">"How do you keep data correct while everyone changes it at once?"</div>
+    <div class="c">CS 201 → CS 330. Data structures, then transactions — the
+    'i' word: invariants, again, at industrial scale.</div>
+  </details>
+  <details><summary>Languages &amp; Compilers</summary>
+    <div class="q">"How do you say precisely what you mean — and check it mechanically?"</div>
+    <div class="c">CS 340 → CS 410. Programs as data (Lesson 1's punchline)
+    taken to its logical conclusion: programs that read programs.</div>
+  </details>
+  <details><summary>Theory</summary>
+    <div class="q">"What can be computed at all — and at what unavoidable cost?"</div>
+    <div class="c">MATH 120 → CS 370 → CS 301. The limits are real, provable,
+    and occasionally your get-out-of-a-meeting card.</div>
+  </details>
+  <details><summary>AI &amp; Machine Learning</summary>
+    <div class="q">"Can behavior be learned from data instead of written by hand?"</div>
+    <div class="c">MATH 240 + MATH 360 → CS 430 → CS 440. Ends with you
+    training a small sibling of your current professor.</div>
+  </details>
+  <details><summary>Software Engineering</summary>
+    <div class="q">"How do humans sustain correctness across years and teams?"</div>
+    <div class="c">CS 350. The only region where you arrive with 16 years of
+    field data; come ready to argue with the textbook.</div>
+  </details>
+</div>
+
+<h2>The through-lines</h2>
+
+<p>Watch for three ideas that reappear in every region until the pattern is
+unmistakable:</p>
+
+<ul>
+  <li><strong>Abstraction</strong> — every layer hides a machine to present a
+  simpler one: Python hides frames, the OS hides the CPU, TCP hides packet
+  loss, SQL hides B-trees. The field is a tower of well-chosen lies.</li>
+  <li><strong>Invariants</strong> — from Lesson 3's loops to database
+  transactions to replicated consensus: progress is made by finding the
+  statement that must stay true and defending it.</li>
+  <li><strong>Trade-offs measured in growth rates</strong> — Lesson 8's
+  families are the currency every design decision is priced in.</li>
+</ul>
+
+<h2>Closing the course</h2>
+
+<div class="card">
+<p><strong>Quiz 4</strong> (lessons 7–9): <code>uni quiz 101/q4</code>.</p>
+<p><strong>Final project — <code>mdtable</code></strong>: a Markdown table
+formatter that normalizes tables to fixed-width columns. Real parsing, real
+state, real edge cases — and a tool you will genuinely use (the author of
+this course has strong opinions about ragged Markdown tables).
+See <code>final/mdtable/</code>; grade with <code>uni grade 101/final</code>.</p>
+<p>When everything is green: <code>uni status 101</code> to see your first
+three credits post, and <code>uni next</code> to meet MATH 110.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/tutorial/">The Python tutorial</a> — you've now met most of it; skim §6–9 to fill gaps.</li>
+  <li>Your own syllabi — reread <code>301</code>, <code>370</code>, and
+  <code>410</code>'s README files; they will read differently than they did
+  three weeks ago.</li>
+</ul>
+
+</body>
+</html>

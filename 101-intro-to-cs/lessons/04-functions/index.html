@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 101 · Lesson 4 — Functions, Contracts, and the Call Stack</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button {
+    font: inherit; font-family: -apple-system, sans-serif; cursor: pointer;
+    background: var(--accent); color: var(--bg); border: none; border-radius: 6px;
+    padding: .4rem 1rem; margin-right: .5rem;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .stack { display: flex; flex-direction: column-reverse; gap: .3rem; margin: .75rem 0;
+    min-height: 8rem; justify-content: flex-end; }
+  .frame { border: 1px solid var(--border); border-left: 4px solid var(--accent);
+    border-radius: 6px; padding: .4rem .7rem;
+    font-family: ui-monospace, Menlo, monospace; font-size: .85rem; }
+  .narration { font-family: ui-monospace, Menlo, monospace; font-size: .9rem;
+    white-space: pre-wrap; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 101 · Introduction to Computer Science · Lesson 4</p>
+<h1>Functions, Contracts, and the Call Stack</h1>
+
+<p>A function is three things at once: a <em>contract</em> (what it promises,
+given what), a <em>scope</em> (a private namespace), and a <em>stack frame</em>
+(a live activation record). Professionals conflate the three daily and get
+away with it; this lesson takes them apart once, properly.</p>
+
+<h2>1. The contract view</h2>
+
+<p>A function's <strong>contract</strong>: if the caller supplies arguments
+meeting the <em>precondition</em>, the function delivers a result meeting the
+<em>postcondition</em> — and touches nothing else. That last clause has a
+name: a function with no observable effects beyond its return value is
+<strong>pure</strong>. Pure functions are trivially testable (you have been
+exploiting this in every assignment) and compose like Lego. In Python, the
+docstring states the contract:</p>
+
+<pre><code>def gcd(a, b):
+    """Return the greatest common divisor of non-negative a and b.
+
+    gcd(n, 0) == n by convention.        &lt;- postcondition, edge included
+    """</code></pre>
+
+<p>Also part of the contract, easy to forget: a Python function with no
+<code>return</code> — or a bare <code>return</code> — returns
+<code>None</code>. Silently. A whole genus of bugs
+(<code>result = things.sort()</code>) lives in that silence.</p>
+
+<h2>2. The scope view</h2>
+
+<p>Names created inside a function are <strong>local</strong>: born at call
+time, gone at return. Python resolves a name by searching scopes in
+<strong>LEGB</strong> order — Local, Enclosing function, Global (module),
+Built-in — and stops at the first hit. One rule with teeth: <em>assigning</em>
+to a name anywhere in a function makes it local <em>everywhere</em> in that
+function, even before the assignment line. Reading a global is free;
+shadowing it is automatic; writing it requires an explicit
+<code>global</code> declaration you should almost never use.</p>
+
+<details class="card predict">
+  <summary>Predict: <code>x = 10</code> at module level; a function does
+  <code>print(x)</code> then <code>x = 5</code>. What happens at the print?</summary>
+  <p><code>UnboundLocalError</code>. The assignment on the <em>later</em> line
+  made <code>x</code> local to the whole function, so the print refers to a
+  local that doesn't exist yet. Scope is decided at compile time, not line by
+  line.</p>
+</details>
+
+<h2>3. The stack view</h2>
+
+<p>Each call pushes a <strong>frame</strong> — parameters, locals, and where
+to resume in the caller. Return pops it. That's the entire mechanism behind
+"where am I?" in every language you know, and it is why tracebacks look the
+way they do. Step through a short program:</p>
+
+<pre><code>def main():          # calls format_greeting, prints result
+    message = format_greeting("Mike")
+    print(message)
+
+def format_greeting(name):   # calls shout, wraps result
+    loud = shout(name)
+    return "Hello, " + loud + "!"
+
+def shout(text):
+    return text.upper()</code></pre>
+
+<div class="card widget" id="stackw">
+  <button id="stack-step">step</button>
+  <button id="stack-reset" class="secondary">reset</button>
+  <div class="stack" id="stack-frames"></div>
+  <div class="narration" id="stack-narration"></div>
+</div>
+
+<h2>4. Parameters, defaults, and one famous trap</h2>
+
+<p>Arguments bind by position, by keyword (<code>f(name="Mike")</code>), or
+both. Default values are handy — and evaluated <strong>once, at definition
+time</strong>, not per call. With immutable defaults that's invisible. With a
+mutable default (<code>def f(items=[])</code>) it means every call shares
+one list that remembers previous calls. The idiom: default to
+<code>None</code>, create inside. Lesson 6 explains the machinery; for now,
+treat <code>def f(x=[])</code> as a code smell with a wanted poster.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: shadowing, the
+silent <code>None</code> return, and keyword binding. Predict first, then
+<code>uni grade 101/explore-04</code>.</p>
+<p><strong>Quiz 2</strong> (lessons 2–4) is now open:
+<code>uni quiz 101/q2</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/tutorial/controlflow.html#defining-functions">Python tutorial §4.7–4.8: Defining Functions</a>.</li>
+  <li><a href="https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects">Official FAQ: why are default values shared between objects?</a></li>
+  <li><a href="https://pythontutor.com/">Python Tutor</a> — paste the three-function program above and watch frames push and pop for real.</li>
+</ul>
+
+<script>
+(function () {
+  const script = [
+    { frames: ['main()'], text: 'main() is called; its frame holds the local "message" (unassigned yet).' },
+    { frames: ['main()', 'format_greeting(name="Mike")'], text: 'main needs format_greeting\'s answer, so it pushes a frame and waits.' },
+    { frames: ['main()', 'format_greeting(name="Mike")', 'shout(text="Mike")'], text: 'format_greeting likewise waits on shout. Three frames deep.' },
+    { frames: ['main()', 'format_greeting(name="Mike")'], text: 'shout returns "MIKE"; its frame is destroyed. loud = "MIKE".' },
+    { frames: ['main()'], text: 'format_greeting returns "Hello, MIKE!"; frame destroyed. message is bound.' },
+    { frames: [], text: 'main prints and returns. Stack empty: the program is done.\nEvery traceback you have ever read is a snapshot of this structure.' },
+  ];
+  let step = 0;
+  const framesBox = document.getElementById('stack-frames');
+  const narration = document.getElementById('stack-narration');
+  function render() {
+    const state = script[step];
+    framesBox.innerHTML = '';
+    state.frames.forEach(label => {
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+      frame.textContent = label;
+      framesBox.appendChild(frame);
+    });
+    narration.textContent = 'step ' + step + ': ' + state.text;
+  }
+  document.getElementById('stack-step').addEventListener('click', () => {
+    if (step < script.length - 1) { step++; render(); }
+  });
+  document.getElementById('stack-reset').addEventListener('click', () => { step = 0; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

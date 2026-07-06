@@ -1,0 +1,82 @@
+{
+  "id": "q2",
+  "title": "Quiz 2 — Values, Control Flow, Functions (Lessons 2–4)",
+  "questions": [
+    {
+      "id": "q2-1",
+      "prompt": "In Python, -7 // 2 equals:",
+      "choices": ["-3", "-4", "3", "-3.5"],
+      "salt": "101.q2.1",
+      "answer_hash": "c3a52c2491711fd8d78334a57b308b1d84ae02974cc496c2da1e44c90ba1bc91"
+    },
+    {
+      "id": "q2-2",
+      "prompt": "0.1 + 0.2 == 0.3 is False because:",
+      "choices": [
+        "floats are binary fractions, and 0.1 has no exact binary representation",
+        "Python compares floats by identity, not value",
+        "a longstanding bug in CPython",
+        "the rounding mode defaults to truncation"
+      ],
+      "salt": "101.q2.2",
+      "answer_hash": "248c2e5b9f74e885a035abb732f3e98ff35df506580af7020e88de147ab22b20"
+    },
+    {
+      "id": "q2-3",
+      "prompt": "Python strings are:",
+      "choices": [
+        "mutable",
+        "immutable — every 'modification' builds a new string",
+        "immutable only when interned",
+        "mutable via index assignment"
+      ],
+      "salt": "101.q2.3",
+      "answer_hash": "6f9178d6769e88f8581418fe57c44296a5275db43954889cf7301ab3a2cf24f1"
+    },
+    {
+      "id": "q2-4",
+      "prompt": "After x = \"hi\"; y = x; x = x + \"!\", the value of y is:",
+      "choices": ["\"hi!\"", "\"hi\"", "an alias of x, so both change", "undefined"],
+      "salt": "101.q2.4",
+      "answer_hash": "80dded594ed487c67d7bd22191e0824446c713c34de482c873993d3a3e71e002"
+    },
+    {
+      "id": "q2-5",
+      "prompt": "A function whose body contains no return statement returns:",
+      "choices": ["0", "None", "the last expression evaluated", "nothing — calling it is an error"],
+      "salt": "101.q2.5",
+      "answer_hash": "e619ba87349100cb1ed98d7c4e6b9b92fe2b6da32bdb38bec17375c6a4f44484"
+    },
+    {
+      "id": "q2-6",
+      "prompt": "list(range(2, 11, 3)) equals:",
+      "choices": ["[2, 5, 8]", "[2, 5, 8, 11]", "[3, 6, 9]", "[2, 4, 6, 8, 10]"],
+      "salt": "101.q2.6",
+      "answer_hash": "370931ebe63f8a9d5c0bb1091fb606c1d59fb174d9dc665062c189f83fea9ee3"
+    },
+    {
+      "id": "q2-7",
+      "prompt": "A loop invariant is:",
+      "choices": [
+        "a statement about state that is true before the loop and preserved by every iteration",
+        "a variable the loop never modifies",
+        "the loop's terminating condition",
+        "a loop guaranteed to terminate"
+      ],
+      "salt": "101.q2.7",
+      "answer_hash": "e122dc4451c6d819c576d99aa071150a53350678d4c8f1cef10c24fbbc375111"
+    },
+    {
+      "id": "q2-8",
+      "prompt": "Assigning to a name anywhere inside a function makes that name:",
+      "choices": [
+        "global for the whole program",
+        "local throughout the entire function, even before the assignment line",
+        "local only after the assignment line executes",
+        "a closure variable"
+      ],
+      "salt": "101.q2.8",
+      "answer_hash": "acd475456047a8d5ca72a6f2f2affdeef5cf6cc8e0f6f317cb94d2ac1bdef8ab"
+    }
+  ]
+}

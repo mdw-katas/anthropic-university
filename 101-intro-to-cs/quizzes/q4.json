@@ -1,0 +1,90 @@
+{
+  "id": "q4",
+  "title": "Quiz 4 — Programs, Efficiency, and the Field (Lessons 7–9)",
+  "questions": [
+    {
+      "id": "q4-1",
+      "prompt": "A module is imported twice in the same process. Its top-level code:",
+      "choices": [
+        "runs twice",
+        "runs once; the second import is a sys.modules cache hit",
+        "runs zero times — only definitions are read",
+        "raises ImportError"
+      ],
+      "salt": "101.q4.1",
+      "answer_hash": "c9637835278e9c7e4f4090cffe8991179978f96b5982288f8d04d76643e36e56"
+    },
+    {
+      "id": "q4-2",
+      "prompt": "In a Python traceback, the line that actually raised is found:",
+      "choices": [
+        "on the first line, right after the header",
+        "wherever the deepest indentation is",
+        "in the last frame shown — read tracebacks bottom-up",
+        "in the middle frame"
+      ],
+      "salt": "101.q4.2",
+      "answer_hash": "3d72baa53e2b196b32b194c62666b9699bf69710ba2fe36fb366f968dc2283d1"
+    },
+    {
+      "id": "q4-3",
+      "prompt": "The point of `if __name__ == \"__main__\":` is that the file:",
+      "choices": [
+        "can be imported without side effects, running main() only as a script",
+        "loads measurably faster",
+        "hides its private functions from importers",
+        "declares its entry point to the interpreter"
+      ],
+      "salt": "101.q4.3",
+      "answer_hash": "e5f742c18ebbaa1e20cae01392b8bd5e7c288225b098ea2eb4f0b3c7dd3cac1e"
+    },
+    {
+      "id": "q4-4",
+      "prompt": "Debugging 'as science' begins with:",
+      "choices": [
+        "changing the most suspicious line and rerunning",
+        "a minimal reproduction and a falsifiable hypothesis",
+        "wrapping the failure in try/except to gather data",
+        "stepping through every line in the debugger"
+      ],
+      "salt": "101.q4.4",
+      "answer_hash": "19c3139d4d99cb4df438f7af25c18f571ffb4a469e6f60fcc100428d3e34dc44"
+    },
+    {
+      "id": "q4-5",
+      "prompt": "Slowest-growing to fastest-growing:",
+      "choices": [
+        "n, log n, n log n, n²",
+        "log n, n, n log n, n²",
+        "log n, n log n, n, n²",
+        "n, n log n, n², log n"
+      ],
+      "salt": "101.q4.5",
+      "answer_hash": "2d0973cbf6b61bbe93c532c1f121860ffe7606ebd19b63676ad721b9094d9ed5"
+    },
+    {
+      "id": "q4-6",
+      "prompt": "`x in big_set` beats `x in big_list` because:",
+      "choices": [
+        "sets keep their elements sorted for bisection",
+        "lists store boxed values; sets store raw ones",
+        "hashing gives sets roughly constant-time membership; lists scan linearly",
+        "sets memoize previous membership queries"
+      ],
+      "salt": "101.q4.6",
+      "answer_hash": "88c7e0dddef79da99978df6b1f68dc094371436229cdb376a84bc26159c2fb26"
+    },
+    {
+      "id": "q4-7",
+      "prompt": "Which course in this degree proves that some problems cannot be computed at all?",
+      "choices": [
+        "CS 301 — Algorithms",
+        "CS 350 — Software Engineering",
+        "CS 330 — Database Systems",
+        "CS 370 — Theory of Computation"
+      ],
+      "salt": "101.q4.7",
+      "answer_hash": "d6d9f41344ae73f0638480d22c46b93e8fe0b2342b971820d129b7ec5fc50dff"
+    }
+  ]
+}
