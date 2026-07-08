@@ -7,10 +7,10 @@ Predict, run, then: uni grade 101/explore-02
 
 WORD = "abstraction"
 
-PREDICT_SLICE = None    # WORD[2:6]
-PREDICT_PREFIX = None   # WORD[:3]
-PREDICT_SUFFIX = None   # WORD[-4:]
-PREDICT_AFTER_UPPER = None  # WORD itself, after WORD.upper() is called
+PREDICT_SLICE       = "stra"         # WORD[2:6]
+PREDICT_PREFIX      = "abs"          # WORD[:3]
+PREDICT_SUFFIX      = "tion"         # WORD[-4:]
+PREDICT_AFTER_UPPER = "abstraction"  # WORD itself, after WORD.upper() is called
 
 
 if __name__ == "__main__":

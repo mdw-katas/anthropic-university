@@ -3,8 +3,8 @@
 Predict, run, then: uni grade 101/explore-02
 """
 
-PREDICT_Y = None  # see rebind() below
-PREDICT_B = None
+PREDICT_Y = "hello"  # see rebind() below
+PREDICT_B = 5
 
 
 def rebind():
@@ -22,7 +22,7 @@ def arithmetic():
 
 
 if __name__ == "__main__":
-    x, y = rebind()
+    x, y = rebind() # "hello!" "hello"
     print(f"x = {x!r}, y = {y!r}")
-    a, b = arithmetic()
+    a, b = arithmetic() # 10 5
     print(f"a = {a}, b = {b}")
