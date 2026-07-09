@@ -7,8 +7,8 @@ uni grade 101/explore-03
 (Hint for pairs: 4 + 3 + 2 + 1 + 0. This is Lesson 8 foreshadowed.)
 """
 
-PREDICT_PAIRS_FOR_5 = None
-PREDICT_GRID_FOR_5 = None
+PREDICT_PAIRS_FOR_5 = 10
+PREDICT_GRID_FOR_5 = 25
 
 
 def count_pairs(n):

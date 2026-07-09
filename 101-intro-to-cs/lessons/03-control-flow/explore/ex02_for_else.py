@@ -4,9 +4,9 @@ Predict what classify returns in each case, run, then:
 uni grade 101/explore-03
 """
 
-PREDICT_PRESENT = None   # classify([4, 7, 9], 7)
-PREDICT_ABSENT = None    # classify([4, 7, 9], 5)
-PREDICT_EMPTY = None     # classify([], 5) — does else run on an empty loop?
+PREDICT_PRESENT = "found"     # classify([4, 7, 9], 7)
+PREDICT_ABSENT = "missing"    # classify([4, 7, 9], 5)
+PREDICT_EMPTY = "missing"     # classify([], 5) — does else run on an empty loop?
 
 
 def classify(items, target):
