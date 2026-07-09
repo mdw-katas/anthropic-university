@@ -3,8 +3,8 @@
 Predict, run, then: uni grade 101/explore-04
 """
 
-PREDICT_SHADOW_RETURN = None   # shadow()
-PREDICT_MODULE_X_AFTER = None  # x, after shadow() has been called
+PREDICT_SHADOW_RETURN = 5   # shadow()
+PREDICT_MODULE_X_AFTER = 10  # x, after shadow() has been called
 
 x = 10
 
