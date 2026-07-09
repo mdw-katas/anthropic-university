@@ -111,8 +111,10 @@ on code blocks; typographic punctuation in prose is fine).
 - NEVER write a plaintext answer anywhere in the repo — not in comments,
   not in commit messages. The key exists only in your working notes and in
   the verification pipe (below).
-- Distribute correct letters roughly evenly across a/b/c/d — models drift
-  toward 'a'; count yours before hashing.
+- There is no need to distribute correct letters evenly across a/b/c/d.
+  The `uni grade` tool will present choices to the student in a randomized
+  order, but will map back to the original ordering when checking answers
+  against the stored hash.
 - Distractors must be *plausible* misconceptions, ideally ones the lesson
   explicitly corrects. "None of the above" and joke options are banned.
 - Questions test understanding, not recall of the lesson's phrasing.

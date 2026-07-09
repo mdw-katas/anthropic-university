@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"os"
 	"strings"
 	"time"
@@ -216,7 +217,9 @@ func runQuiz(root string, curriculum Curriculum, args []string) int {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		return 1
 	}
-	score, err := administerQuiz(quiz, os.Stdin, os.Stdout)
+	now := uint64(time.Now().UnixMicro())
+	randomizer := rand.New(rand.NewPCG(now, now))
+	score, err := administerQuiz(quiz, randomizer, os.Stdin, os.Stdout)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		return 1

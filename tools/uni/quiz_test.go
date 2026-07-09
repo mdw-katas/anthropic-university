@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math"
+	"math/rand/v2"
 	"strings"
 	"testing"
 )
@@ -43,7 +45,7 @@ func fixtureQuiz() Quiz {
 
 func TestAdministerQuizPerfectScore(t *testing.T) {
 	var out strings.Builder
-	score, err := administerQuiz(fixtureQuiz(), strings.NewReader("a\nb\n"), &out)
+	score, err := administerQuiz(fixtureQuiz(), noShuffleRand, strings.NewReader("a\nb\n"), &out)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +59,7 @@ func TestAdministerQuizPerfectScore(t *testing.T) {
 
 func TestAdministerQuizHalfScore(t *testing.T) {
 	var out strings.Builder
-	score, err := administerQuiz(fixtureQuiz(), strings.NewReader("a\na\n"), &out)
+	score, err := administerQuiz(fixtureQuiz(), noShuffleRand, strings.NewReader("a\na\n"), &out)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +70,7 @@ func TestAdministerQuizHalfScore(t *testing.T) {
 
 func TestAdministerQuizRejectsInvalidChoiceThenAccepts(t *testing.T) {
 	var out strings.Builder
-	score, err := administerQuiz(fixtureQuiz(), strings.NewReader("z\na\nb\n"), &out)
+	score, err := administerQuiz(fixtureQuiz(), noShuffleRand, strings.NewReader("z\na\nb\n"), &out)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,8 +84,14 @@ func TestAdministerQuizRejectsInvalidChoiceThenAccepts(t *testing.T) {
 
 func TestAdministerQuizErrorsOnTruncatedInput(t *testing.T) {
 	var out strings.Builder
-	_, err := administerQuiz(fixtureQuiz(), strings.NewReader("a\n"), &out)
+	_, err := administerQuiz(fixtureQuiz(), noShuffleRand, strings.NewReader("a\n"), &out)
 	if err == nil {
 		t.Error("expected an error when input ends before the quiz does")
 	}
 }
+
+type noShuffleSource struct{}
+
+func (noShuffleSource) Uint64() uint64 { return math.MaxUint64 }
+
+var noShuffleRand = rand.New(noShuffleSource{})

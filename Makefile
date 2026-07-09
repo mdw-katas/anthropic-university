@@ -3,7 +3,7 @@ UNI := ./bin/uni
 .PHONY: test build status next clean
 
 test:
-	cd tools/uni && go mod tidy && gofmt -l . && go vet ./... && go test -race -cover ./...
+	cd tools/uni && go mod tidy && gofmt -l . && go vet ./... && go test -race -cover -count=1 ./...
 
 build:
 	cd tools/uni && go build -o ../../bin/uni .

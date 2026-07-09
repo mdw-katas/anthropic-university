@@ -7,8 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -51,20 +53,31 @@ func loadQuiz(root, courseDir, quizPath string) (quiz Quiz, err error) {
 	return quiz, nil
 }
 
-func administerQuiz(quiz Quiz, in io.Reader, out io.Writer) (score float64, err error) {
+func administerQuiz(quiz Quiz, randomizer *rand.Rand, in io.Reader, out io.Writer) (score float64, err error) {
 	reader := bufio.NewReader(in)
 	correct := 0
 	fmt.Fprintf(out, "\n%s (%d questions)\n\n", quiz.Title, len(quiz.Questions))
 	for number, question := range quiz.Questions {
 		fmt.Fprintf(out, "%d. %s\n", number+1, question.Prompt)
-		for choice, text := range question.Choices {
+		choices := slices.Clone(question.Choices)
+		randomizer.Shuffle(len(choices), func(i, j int) {
+			choices[i], choices[j] = choices[j], choices[i]
+		})
+		mapping := make(map[string]string)
+		for originalIndex, original := range question.Choices {
+			randomizedIndex := slices.Index(choices, original)
+			originalLetter := fmt.Sprintf("%c", 'a'+originalIndex)
+			randomizedLetter := fmt.Sprintf("%c", 'a'+randomizedIndex)
+			mapping[randomizedLetter] = originalLetter
+		}
+		for choice, text := range choices {
 			fmt.Fprintf(out, "   %c) %s\n", 'a'+choice, text)
 		}
-		answer, readErr := promptForChoice(reader, out, len(question.Choices))
+		answer, readErr := promptForChoice(reader, out, len(choices))
 		if readErr != nil {
 			return 0, readErr
 		}
-		if question.isCorrect(answer) {
+		if question.isCorrect(mapping[answer]) {
 			correct++
 			fmt.Fprintln(out, "   ✓ correct")
 		} else {
