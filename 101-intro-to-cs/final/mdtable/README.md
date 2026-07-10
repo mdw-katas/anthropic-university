@@ -3,8 +3,8 @@
 Build a tool that rewrites Markdown so every table has fixed-width columns:
 
 ```
-| Course | Title |                      | Course | Title                  |
-|---|---|                        →     |--------|------------------------|
+| Course | Title |                     | Course | Title                  |
+|---|---|                        ->    |--------|------------------------|
 | 101 | Intro to CS |                  | 101    | Intro to CS            |
 | 440 | Deep Learning and LLMs |       | 440    | Deep Learning and LLMs |
 ```
