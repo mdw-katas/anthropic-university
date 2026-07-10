@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 102 · Lesson 8 — Iterators, Generators, Laziness</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button, .widget input {
+    font: inherit; font-family: -apple-system, sans-serif;
+  }
+  .widget button {
+    cursor: pointer; background: var(--accent); color: var(--bg);
+    border: none; border-radius: 6px; padding: .4rem 1rem; margin: .2rem .3rem .2rem 0;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .widget input { background: var(--bg); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: .35rem .5rem; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: .4rem .8rem; text-align: left; }
+  th { font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+  /* ---- widget-specific styles go below this line ---- */
+  #pipe-view { font-family: ui-monospace, Menlo, monospace; font-size: .88rem;
+    white-space: pre-wrap; margin-top: .6rem; }
+  #pipe-log { font-family: ui-monospace, Menlo, monospace; font-size: .82rem;
+    white-space: pre-wrap; margin-top: .6rem; color: var(--muted);
+    max-height: 12em; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 102 · Program Design and Abstraction · Lesson 8</p>
+<h1>Laziness — Computing Only What Is Consumed</h1>
+
+<p>Every collection you have returned from a function was a decision you
+may not have known you were making: compute <em>everything, now, in
+memory</em>. This lesson is about the other choice — values produced one
+at a time, on demand, only as far as the consumer pulls. Python's iterator
+protocol is the plumbing; generators are the ergonomic way to build it;
+and "lazy by default, materialize deliberately" is the design stance that
+falls out.</p>
+
+<h2>1. The protocol under every for loop</h2>
+
+<pre><code>for item in things:        # is sugar for:
+    ...                    #   it = iter(things)       # __iter__
+                           #   while True:
+                           #       try: item = next(it) # __next__
+                           #       except StopIteration: break</code></pre>
+
+<p>An <strong>iterable</strong> can hand out iterators (<code>__iter__</code>);
+an <strong>iterator</strong> produces values (<code>__next__</code>) until it
+raises <code>StopIteration</code>. The distinction with teeth: a list is an
+iterable you can walk any number of times; an iterator <em>is its own
+progress</em> — a stream with no rewind. Every iterator is also iterable
+(returning itself), which is exactly why passing one around and looping
+twice silently does nothing the second time. The exploration makes you
+predict that ambush.</p>
+
+<h2>2. Generators: functions that pause</h2>
+
+<pre><code>def countdown(n):
+    while n &gt; 0:
+        yield n        # emit a value, FREEZE right here
+        n -= 1</code></pre>
+
+<p>A <code>def</code> containing <code>yield</code> does not run when
+called — it instantly returns a generator object with the body frozen at
+the top. Each <code>next()</code> runs to the next <code>yield</code> and
+suspends: locals, position, the whole frame held in stasis. It is
+<code>make_counter</code> from Lesson 5 with the interpreter managing the
+state, or an iterator class with the boilerplate deleted. Two consequences
+worth scars: the body's validation code doesn't run at call time (your
+"fail fast" check fires at first <code>next()</code>, far from the bad
+call), and a <code>return</code> inside a generator means <em>stop</em>,
+not <em>produce</em>.</p>
+
+<h2>3. Pull, don't push (the widget)</h2>
+
+<p>Chain generators and you get a pipeline where the <em>consumer</em> sets
+the pace. Nothing runs until something pulls:</p>
+
+<div class="card widget" id="pipe-widget">
+  <pre><code>naturals = count(1)                        # 1, 2, 3, ... forever
+squares  = (n * n for n in naturals)
+odds     = (s for s in squares if s % 2 == 1)
+# consumer: next(odds), five times</code></pre>
+  <button id="pipe-next">next(odds)</button>
+  <button id="pipe-reset" class="secondary">reset</button>
+  <div id="pipe-view"></div>
+  <div id="pipe-log"></div>
+  <p class="footnote">The infinite source is harmless: only what the
+  consumer demands is ever produced. Note the pull cascading right to left
+  — odds asks squares, squares asks naturals — and even squares being
+  produced and immediately discarded by the filter. Constant memory,
+  arbitrary stream.</p>
+</div>
+
+<h2>4. Laziness as a design tool</h2>
+
+<p>The design payoff mirrors Lesson 5: generators separate
+<em>production</em> from <em>consumption policy</em>. A parser that yields
+records lets the caller decide whether to stream, count, or collect —
+without the parser growing <code>limit=</code> and <code>as_list=</code>
+parameters. Log processing, pagination, walking trees: same shape.
+<code>itertools</code> is the standard library's kit of lazy combinators
+(<code>islice</code> is lazy <code>[:n]</code>, <code>chain</code> is lazy
+concatenation); skim its docs once so you know what not to reinvent. The
+final's <code>parse_ledger</code> is graded on being genuinely lazy — a
+probing test counts how far it reads.</p>
+
+<details class="card predict">
+  <summary>Predict: numbers = iter([1, 2, 3, 4]); first = 3 in numbers.
+  What does list(numbers) give afterward?</summary>
+  <p><code>[4]</code>. The membership test <em>consumed</em> the stream up
+  to and including the 3 it found. The iterator has no memory of what
+  passed through it and no way back. If you need to look twice,
+  materialize: <code>numbers = list(source)</code> — that is a legitimate
+  choice, made deliberately.</p>
+</details>
+
+<h2>5. When to materialize</h2>
+
+<p>Laziness is a default, not a religion. Reach for <code>list()</code>
+when you need <code>len</code>, random access, multiple passes, or sorting
+(which must see everything anyway). And know laziness's honest cost:
+errors surface where the value is <em>consumed</em>, not where the
+pipeline was built, which moves tracebacks away from causes. Debugging a
+five-stage lazy pipeline is CS 220's pointer-chasing with nicer syntax —
+build pipelines short, name the stages, and materialize at boundaries you
+want to be able to inspect.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: the one-shot
+iterator ambush, interleaved pull order, and validation that fires too
+late. Predict first, then <code>uni grade 102/explore-08</code>.</p>
+<p><strong>Quiz 4 — Testing, Laziness, and Shape</strong> comes after
+Lesson 9: <code>uni quiz 102/q4</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/glossary.html#term-iterator">iterator</a> and <a href="https://docs.python.org/3/glossary.html#term-generator">generator</a> — the glossary entries are precise and short.</li>
+  <li><a href="https://docs.python.org/3/library/itertools.html">itertools</a> — the lazy combinator kit; read the recipes section.</li>
+  <li><a href="https://docs.python.org/3/reference/expressions.html#yield-expressions">yield expressions</a> — the full semantics, including generator .close() and .send().</li>
+</ul>
+
+<script>
+(function () {
+  let naturalsAt, produced, kept, log;
+  const view = document.getElementById('pipe-view');
+  const logEl = document.getElementById('pipe-log');
+  function reset() {
+    naturalsAt = 0; produced = 0; kept = []; log = [];
+    render('press next(odds) to pull one value through the pipeline');
+  }
+  function render(status) {
+    view.textContent =
+      'naturals produced: ' + produced +
+      '   squares computed: ' + produced +
+      '   odds delivered: ' + kept.length + '\n' +
+      'delivered so far: [' + kept.join(', ') + ']\n' + status;
+    logEl.textContent = log.slice(-14).join('\n');
+  }
+  document.getElementById('pipe-next').addEventListener('click', function () {
+    if (kept.length >= 12) { render('that is plenty; reset if you like'); return; }
+    while (true) {
+      naturalsAt++; produced++;
+      const square = naturalsAt * naturalsAt;
+      log.push('odds asks squares; squares asks naturals -> ' + naturalsAt +
+               '; square = ' + square + (square % 2 ? '  KEEP' : '   discard'));
+      if (square % 2 === 1) {
+        kept.push(square);
+        render('next(odds) returned ' + square);
+        break;
+      }
+    }
+  });
+  document.getElementById('pipe-reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 102 · Lesson 2 — Abstract Data Types</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button, .widget input {
+    font: inherit; font-family: -apple-system, sans-serif;
+  }
+  .widget button {
+    cursor: pointer; background: var(--accent); color: var(--bg);
+    border: none; border-radius: 6px; padding: .4rem 1rem; margin: .2rem .3rem .2rem 0;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .widget input { background: var(--bg); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: .35rem .5rem; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: .4rem .8rem; text-align: left; }
+  th { font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+  /* ---- widget-specific styles go below this line ---- */
+  .widget .row { font-family: ui-monospace, Menlo, monospace; font-size: .88rem;
+    margin: .35rem 0; white-space: pre-wrap; }
+  .widget .row b { font-family: -apple-system, sans-serif; font-size: .8rem;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  #adt-crash { color: #c0392b; font-family: ui-monospace, Menlo, monospace;
+    font-size: .88rem; margin-top: .4rem; white-space: pre-wrap; }
+  @media (prefers-color-scheme: dark) { #adt-crash { color: #e07b6a; } }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 102 · Program Design and Abstraction · Lesson 2</p>
+<h1>Abstract Data Types — Program to the Promise, Not the Parts</h1>
+
+<p>Every time you use a Python <code>dict</code>, you rely on operations
+whose contracts you know cold and an implementation (open-addressed hash
+table, as of this writing) you may never have read. That arrangement — a
+type defined <em>entirely</em> by its operations and their contracts, with
+the representation hidden behind them — is an <strong>abstract data
+type</strong>. Barbara Liskov formalized it in 1974 building the CLU
+language, and it is the single most load-bearing idea in this course.</p>
+
+<h2>1. An ADT is a bundle of contracts</h2>
+
+<p>A stack is not "a list you use from one end." A stack is: whatever type
+satisfies these operation contracts —</p>
+
+<table>
+  <tr><th>Operation      </th><th>Contract                                        </th></tr>
+  <tr><td><code>push(x)</code> </td><td>Afterward, <code>peek()</code> returns <code>x</code>; size grows by 1  </td></tr>
+  <tr><td><code>pop()</code>   </td><td>Removes and returns the most recent unpopped push; size shrinks by 1; requires nonempty </td></tr>
+  <tr><td><code>peek()</code>  </td><td>Returns what <code>pop()</code> would, without removing it; requires nonempty </td></tr>
+  <tr><td><code>len(s)</code>  </td><td>Number of pushed-but-not-popped items           </td></tr>
+</table>
+
+<p>Nothing in that table mentions lists, arrays, or pointers. Lesson 1 gave
+you contracts for functions; an ADT is the same discipline applied to a
+whole type. The operations are the entire public story — which is why the
+set of operations you choose <em>is</em> the design decision.</p>
+
+<h2>2. The abstraction barrier (the widget)</h2>
+
+<p>Below are two complete stack implementations: one backed by a Python
+list, one by linked cells. The client code driving the buttons calls only
+the four operations. Swap implementations mid-session; the abstract state
+never flinches. Then press the red button — a "client" that reaches through
+the barrier to <code>._items[0]</code> — and watch what the swap does to it.</p>
+
+<div class="card widget" id="adt-widget">
+  <button id="adt-push">push next value</button>
+  <button id="adt-pop">pop</button>
+  <button id="adt-swap" class="secondary">swap implementation</button>
+  <button id="adt-reset" class="secondary">reset</button>
+  <div class="row"><b>implementation</b>  <span id="adt-impl"></span></div>
+  <div class="row"><b>abstract state</b>  <span id="adt-abstract"></span></div>
+  <div class="row"><b>representation</b>  <span id="adt-rep"></span></div>
+  <button id="adt-leak">run client that reads ._items[0]</button>
+  <div id="adt-crash"></div>
+  <p class="footnote">The rep-dependent client "works" on ArrayStack — and
+  even there it reads the <em>bottom</em>, probably not what its author
+  assumed. On LinkedStack it simply dies. Code that survives only under one
+  representation was never a client of the ADT; it was a dependent of the
+  implementation.</p>
+</div>
+
+<h2>3. Duck typing is Python's interface mechanism</h2>
+
+<p>You know this move from Go: a type satisfies an interface by having the
+methods, not by declaring allegiance. Python goes further — the check
+happens per call, at runtime. Any object with <code>push</code>,
+<code>pop</code>, <code>peek</code>, and <code>__len__</code> <em>is</em> a
+stack as far as client code is concerned. There is no compiler to enforce
+the contract's semantics, though; a <code>pop</code> that returns the
+<em>oldest</em> item has the right shape and the wrong soul. (CS 340 studies
+type systems that can promise more; Lesson 7 shows how tests pin down the
+semantics that types cannot.)</p>
+
+<details class="card predict">
+  <summary>Predict: drain pops until empty. It works on a list and on our
+  stacks. What happens on a dict — say, drain({"a": 1, "b": 2})?</summary>
+  <p><code>dict</code> has a <code>pop</code> method and a length — the duck
+  looks right — but <code>dict.pop</code> <em>requires a key argument</em>,
+  so the zero-argument call raises <code>TypeError</code> at the moment of
+  the call. Duck typing checks nothing in advance; every method call is its
+  own audition. The exploration makes you predict this before running it.</p>
+</details>
+
+<h2>4. Rep exposure: handing clients a crowbar</h2>
+
+<pre><code>class Roster:
+    def __init__(self):
+        self._names = []
+    def members(self):
+        return self._names          # <- the crowbar
+        # return list(self._names)  # <- the fix: defensive copy</code></pre>
+
+<p>Return your internal mutable state directly and every caller holds a
+reference that bypasses all your methods — your invariants can be broken by
+code you have never met, in a stack trace you will not enjoy. The defensive
+copy costs a little; debugging spooky action at a distance costs an
+afternoon. This is CS 101 Lesson 6's aliasing lesson, promoted from
+accident to design concern. Assignment a1 will grade you on it.</p>
+
+<h2>5. Why the barrier pays rent</h2>
+
+<p>The abstraction barrier is what makes change survivable. The list-backed
+stack is fine until profiling says otherwise; swap in something cleverer and
+every honest client keeps working, <em>proven</em> by the operation
+contracts alone. CS 201 spends a semester exploiting exactly this: same
+interface, radically different cost profiles. Design the promise once;
+renegotiate the parts whenever you like.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: duck typing's
+per-call audition, two representations one behavior, and a leaky roster.
+Predict first, then <code>uni grade 102/explore-02</code>.</p>
+<p><strong>Quiz 1 — Contracts and ADTs</strong> is now open:
+<code>uni quiz 102/q1</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/glossary.html#term-duck-typing">Duck typing</a> — the official glossary entry.</li>
+  <li><a href="https://docs.python.org/3/library/collections.abc.html">collections.abc</a> — Python's catalog of named interfaces, worth a skim.</li>
+</ul>
+
+<script>
+(function () {
+  function ArrayStack() {
+    this._items = [];
+    this.push = function (x) { this._items.push(x); };
+    this.pop = function () { return this._items.pop(); };
+    this.contents = function () { return this._items.slice(); };
+    this.repString = function () {
+      return 'ArrayStack  _items = [' + this._items.join(', ') + ']  (top at the END)';
+    };
+    this.name = 'ArrayStack (Python-list-backed)';
+  }
+  function LinkedStack() {
+    this._head = null;
+    this.push = function (x) { this._head = { value: x, next: this._head }; };
+    this.pop = function () {
+      const v = this._head.value; this._head = this._head.next; return v;
+    };
+    this.contents = function () {
+      const out = [];
+      for (let c = this._head; c; c = c.next) out.unshift(c.value);
+      return out;
+    };
+    this.repString = function () {
+      const parts = [];
+      for (let c = this._head; c; c = c.next) parts.push(c.value);
+      return 'LinkedStack  head -> ' + (parts.join(' -> ') || '(null)') + '  (top at the HEAD)';
+    };
+    this.name = 'LinkedStack (linked cells)';
+  }
+  let makers = [ArrayStack, LinkedStack];
+  let which = 0, stack = new ArrayStack(), next = 1;
+  const impl = document.getElementById('adt-impl');
+  const abstract = document.getElementById('adt-abstract');
+  const rep = document.getElementById('adt-rep');
+  const crash = document.getElementById('adt-crash');
+  function rebuild() {
+    const items = stack.contents();
+    stack = new makers[which]();
+    items.forEach(function (x) { stack.push(x); });
+  }
+  function render() {
+    impl.textContent = stack.name;
+    abstract.textContent = '[bottom ' + stack.contents().join(', ') + ' top]';
+    rep.textContent = stack.repString();
+  }
+  document.getElementById('adt-push').addEventListener('click', function () {
+    stack.push(next++); crash.textContent = ''; render();
+  });
+  document.getElementById('adt-pop').addEventListener('click', function () {
+    if (stack.contents().length) stack.pop();
+    crash.textContent = ''; render();
+  });
+  document.getElementById('adt-swap').addEventListener('click', function () {
+    which = 1 - which; rebuild(); crash.textContent = ''; render();
+  });
+  document.getElementById('adt-reset').addEventListener('click', function () {
+    which = 0; stack = new ArrayStack(); next = 1; crash.textContent = ''; render();
+  });
+  document.getElementById('adt-leak').addEventListener('click', function () {
+    if (stack._items !== undefined) {
+      crash.textContent = 'client read stack._items[0] and got: ' +
+        (stack._items.length ? stack._items[0] : 'undefined (empty)') +
+        '\n(it wanted the top; this is the bottom. Wrong even when it "works".)';
+    } else {
+      crash.textContent = "AttributeError: 'LinkedStack' object has no attribute '_items'\n" +
+        '(the client depended on the representation; the swap broke it)';
+    }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

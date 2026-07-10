@@ -1,0 +1,102 @@
+{
+  "id": "q3",
+  "title": "Quiz 3 — Functions and Failure (Lessons 5-6)",
+  "questions": [
+    {
+      "id": "q3-1",
+      "prompt": "Three lambdas created in a loop over range(3), each `lambda: i`. Afterward all three return 2, because:",
+      "choices": [
+        "closures capture the variable, not its value — all three share the one i",
+        "lambdas evaluate their bodies once, at definition time",
+        "range produces a single reused integer object",
+        "the lambdas share compiled bytecode, so they must share results"
+      ],
+      "salt": "102.q3.1",
+      "answer_hash": "30864cc8182f9ab65f09422355553eec7e4ed17169944b3a3bf369294f682a1f"
+    },
+    {
+      "id": "q3-2",
+      "prompt": "The idiomatic repair, `lambda i=i: i`, works because:",
+      "choices": [
+        "keyword arguments are immutable",
+        "it forces the lambda body to run immediately",
+        "defaults are re-evaluated at each call with the current value",
+        "default values are evaluated once, at definition time — freezing that iteration's value"
+      ],
+      "salt": "102.q3.2",
+      "answer_hash": "ddfedd50b6daf22486c16ed5853de94a384424346b19a8b128a0ffa21f9a7b82"
+    },
+    {
+      "id": "q3-3",
+      "prompt": "nonlocal is required when an inner function:",
+      "choices": [
+        "reads a variable from the enclosing function",
+        "rebinds a variable that belongs to the enclosing function",
+        "mutates a list that the enclosing function created",
+        "assigns to a module-level name"
+      ],
+      "salt": "102.q3.3",
+      "answer_hash": "3cf1bc78110be25e7db2ae079cd0ca07e593517e7c6274712b98ce4d00f67989"
+    },
+    {
+      "id": "q3-4",
+      "prompt": "A try statement lists `except Exception:` and then `except ValueError:`. The code raises ValueError. What happens?",
+      "choices": [
+        "the Exception clause catches it; the ValueError clause is unreachable",
+        "the ValueError clause catches it — the most specific match wins",
+        "Python rejects the try statement with a SyntaxError",
+        "both handlers run, top to bottom"
+      ],
+      "salt": "102.q3.4",
+      "answer_hash": "580672b07ddc78bff92615c2d56417c61c915655b075b7440cd915f2a9b2a5aa"
+    },
+    {
+      "id": "q3-5",
+      "prompt": "EAFP beats look-before-you-leap for file access chiefly because:",
+      "choices": [
+        "try blocks execute faster than if statements",
+        "LBYL cannot detect missing files reliably on all platforms",
+        "between the look and the leap, the world can change — the check is a race",
+        "exceptions produce more detailed logging by default"
+      ],
+      "salt": "102.q3.5",
+      "answer_hash": "c327a0837caab52bf4cc6e00609ab3d5632c3c9fd267b9a24ded3a48a2036170"
+    },
+    {
+      "id": "q3-6",
+      "prompt": "raise ConfigError(...) from err does what?",
+      "choices": [
+        "discards err, so callers only ever see the ConfigError",
+        "sets __cause__, so the traceback tells both stories: the translation and the original",
+        "re-raises err with ConfigError's message attached to it",
+        "suppresses ConfigError's traceback in favor of err's"
+      ],
+      "salt": "102.q3.6",
+      "answer_hash": "da1ed366386cdb057a462944b31003c459ec548e7ab860700ae85e697ebacc4f"
+    },
+    {
+      "id": "q3-7",
+      "prompt": "str.find returns -1 while str.index raises ValueError. This pair exists because:",
+      "choices": [
+        "same question, two failure contracts: a sentinel for expected absence, an exception for unexpected",
+        "find predates exceptions in Python and survives for compatibility",
+        "find is substantially faster than index",
+        "index only works on ASCII strings"
+      ],
+      "salt": "102.q3.7",
+      "answer_hash": "a124700109967654ef877ea555bb0962ad49da26723e88ad04ba98f8159011d8"
+    },
+    {
+      "id": "q3-8",
+      "prompt": "A finally block runs:",
+      "choices": [
+        "only when the try block raises",
+        "only when no exception occurred",
+        "before the try block, as setup",
+        "however control leaves the try — return, raise, or plain success"
+      ],
+      "salt": "102.q3.8",
+      "answer_hash": "80f9b3877fad684cfb6f211b5bfad97418aab353ec0a4aaba1c11b9a9fcc4913"
+    }
+  ]
+}

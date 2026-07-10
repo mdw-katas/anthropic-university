@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 102 · Lesson 1 — Contracts</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button, .widget input {
+    font: inherit; font-family: -apple-system, sans-serif;
+  }
+  .widget button {
+    cursor: pointer; background: var(--accent); color: var(--bg);
+    border: none; border-radius: 6px; padding: .4rem 1rem; margin: .2rem .3rem .2rem 0;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .widget input { background: var(--bg); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: .35rem .5rem; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: .4rem .8rem; text-align: left; }
+  th { font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+  /* ---- widget-specific styles go below this line ---- */
+  .widget label { font-family: -apple-system, sans-serif; font-size: .9rem;
+    display: block; margin: .3rem 0; }
+  .widget select { font: inherit; font-family: -apple-system, sans-serif;
+    background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 6px; padding: .3rem .4rem; }
+  #blame-log { font-family: ui-monospace, Menlo, monospace; font-size: .85rem;
+    white-space: pre-wrap; margin-top: .8rem; }
+  #blame-verdict { font-family: -apple-system, sans-serif; font-weight: 600;
+    margin-top: .6rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 102 · Program Design and Abstraction · Lesson 1</p>
+<h1>Contracts — Blame Is a Design Tool</h1>
+
+<p>You have spent sixteen years writing docstrings, API docs, and code review
+comments that say things like "callers must not pass nil here." This lesson
+gives that instinct its formal name — the <em>contract</em> — and its three
+clauses: preconditions, postconditions, and invariants. The payoff is not
+vocabulary. It is that a precise contract tells you, before any debugger
+opens, <strong>whose bug it is</strong>.</p>
+
+<h2>1. The three clauses</h2>
+
+<pre><code>def withdraw(balance, amount):
+    """Return the balance after withdrawing amount.
+
+    Precondition:  0 &lt;= amount &lt;= balance
+    Postcondition: result == balance - amount, and result &gt;= 0
+    """
+    return balance - amount</code></pre>
+
+<p>A <strong>precondition</strong> is what must be true at the moment of the
+call — the caller's obligation. A <strong>postcondition</strong> is what the
+function guarantees on return, <em>provided the precondition held</em> — the
+implementer's obligation. An <strong>invariant</strong> is a condition that
+holds at every observable moment across an entire lifetime — you met loop
+invariants in CS 101 Lesson 3, and Lesson 3 of this course extends them to
+objects. CS 120 will write this trio as the Hoare triple
+<code>{P} C {Q}</code>; today we only need the division of labor.</p>
+
+<h2>2. Blame assignment (the widget)</h2>
+
+<p>The contract is a contract precisely because each failure mode has exactly
+one guilty party. Precondition false at the call site: the <em>caller</em> is
+wrong, no matter what happens next. Precondition true but postcondition false
+on return: the <em>implementation</em> is wrong. Run the combinations:</p>
+
+<div class="card widget" id="blame-machine">
+  <label>Caller behavior:
+    <select id="blame-caller">
+      <option value="honest">withdraw(100, 40) — respects the precondition</option>
+      <option value="overdraft">withdraw(100, 250) — violates the precondition</option>
+    </select>
+  </label>
+  <label>Implementation:
+    <select id="blame-impl">
+      <option value="correct">return balance - amount</option>
+      <option value="fee">return balance - amount - 3 (sneaky fee bug)</option>
+    </select>
+  </label>
+  <button id="blame-run">run the call</button>
+  <button id="blame-reset" class="secondary">reset</button>
+  <div id="blame-log"></div>
+  <div id="blame-verdict"></div>
+</div>
+
+<p>Notice the fourth combination: a precondition-violating caller meeting a
+buggy implementation. The contract renders no verdict on the implementation
+— outside the precondition, the function owes you <em>nothing</em>. Garbage
+in, anything out. That is not sloppiness; it is what makes the implementer's
+job finite.</p>
+
+<details class="card predict">
+  <summary>Predict: withdraw(100, 250) returns -150 with the "correct"
+  implementation. Is the implementation buggy?</summary>
+  <p>No. The precondition (<code>amount &lt;= balance</code>) was false, so the
+  postcondition promises nothing — the implementation satisfied its contract
+  vacuously. The bug lives at the call site. If you want the function itself
+  to reject bad callers loudly, that is a different (and legitimate) contract:
+  "raises <code>ValueError</code> if amount exceeds balance" — which turns
+  misuse into a <em>defined</em> outcome. Lesson 6 is entirely about
+  designing those outcomes.</p>
+</details>
+
+<h2>3. Strong and weak specifications</h2>
+
+<p>Contracts trade off. Weakening a precondition (accepting more inputs)
+makes life easier for callers and harder for implementers; strengthening a
+postcondition (promising more) does the same. The classic trap is a
+postcondition that is <em>accidentally weak</em>. "Returns a sorted list" is
+satisfied by <code>return []</code>. The honest contract for sorting is a
+conjunction: the output is ordered <em>and</em> it is a permutation of the
+input. The second clause is the one everyone forgets, and the one that
+catches real bugs — you will demonstrate this to yourself in the
+explorations, and CS 350's property-based testing builds a career on it.</p>
+
+<h2>4. <code>assert</code>: contract checks, not error handling</h2>
+
+<pre><code>def isqrt(n):
+    assert n &gt;= 0, "precondition: n must be non-negative"
+    ...</code></pre>
+
+<p>Python's <code>assert</code> raises <code>AssertionError</code> when its
+condition is false — and is <strong>deleted entirely</strong> when the
+interpreter runs with <code>-O</code>. That single fact dictates its use:
+assertions document and spot-check contracts during development; they are
+never validation of untrusted input, because production flags can silence
+them. A user typing a negative number is not a contract violation — it is a
+normal, expected event that deserves designed error handling (Lesson 6). A
+<em>colleague's code</em> passing a negative number is a contract violation,
+and an assert that names the guilty clause is a gift to whoever debugs it.</p>
+
+<h2>5. Contracts are the unit of design</h2>
+
+<p>Everything in this course is contracts wearing different outfits. An
+abstract data type (Lesson 2) is a bundle of operation contracts. A
+representation invariant (Lesson 3) is a private contract between a class's
+methods. Substitutability (Lesson 4) is the rule that a subclass may not
+strengthen preconditions or weaken postconditions. A unit test (Lesson 7) is
+a contract clause made executable. When CS 101's final asked for an
+idempotent formatter, that was a postcondition:
+<code>format(format(x)) == format(x)</code>. You have been signing contracts
+all along; now you get to draft them.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: an unchecked
+precondition that fails silently, a postcondition weak enough to let a
+"sort" cheat, and what <code>-O</code> really does to <code>assert</code>.
+Predict first, then <code>uni grade 102/explore-01</code>.</p>
+<p>Quiz 1 opens after Lesson 2: <code>uni quiz 102/q1</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement">The assert statement</a> — including the exact <code>-O</code> behavior.</li>
+  <li><a href="https://docs.python.org/3/using/cmdline.html#cmdoption-O">python -O</a> — the flag that deletes your assertions.</li>
+</ul>
+
+<script>
+(function () {
+  const log = document.getElementById('blame-log');
+  const verdict = document.getElementById('blame-verdict');
+  function reset() { log.textContent = ''; verdict.textContent = ''; }
+  document.getElementById('blame-reset').addEventListener('click', reset);
+  document.getElementById('blame-run').addEventListener('click', function () {
+    const caller = document.getElementById('blame-caller').value;
+    const impl = document.getElementById('blame-impl').value;
+    const balance = 100;
+    const amount = caller === 'honest' ? 40 : 250;
+    const pre = amount >= 0 && amount <= balance;
+    const result = impl === 'correct' ? balance - amount : balance - amount - 3;
+    const post = result === balance - amount && result >= 0;
+    let lines = [];
+    lines.push('call:          withdraw(' + balance + ', ' + amount + ')');
+    lines.push('precondition:  0 <= amount <= balance  ->  ' + pre);
+    lines.push('returned:      ' + result);
+    lines.push('postcondition: result == balance - amount and result >= 0  ->  ' + post);
+    log.textContent = lines.join('\n');
+    if (!pre) {
+      verdict.textContent = 'Verdict: caller at fault. The implementation owes nothing here.';
+    } else if (!post) {
+      verdict.textContent = 'Verdict: implementation at fault. Precondition held; promise broken.';
+    } else {
+      verdict.textContent = 'Verdict: all obligations met.';
+    }
+  });
+})();
+</script>
+</body>
+</html>

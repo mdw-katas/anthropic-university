@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 102 · Lesson 5 — First-Class Functions and Closures</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button, .widget input {
+    font: inherit; font-family: -apple-system, sans-serif;
+  }
+  .widget button {
+    cursor: pointer; background: var(--accent); color: var(--bg);
+    border: none; border-radius: 6px; padding: .4rem 1rem; margin: .2rem .3rem .2rem 0;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .widget input { background: var(--bg); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: .35rem .5rem; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: .4rem .8rem; text-align: left; }
+  th { font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+  /* ---- widget-specific styles go below this line ---- */
+  .widget .madebtn { background: var(--card); color: var(--fg);
+    border: 1px solid var(--accent); }
+  #closure-log { font-family: ui-monospace, Menlo, monospace; font-size: .88rem;
+    white-space: pre-wrap; margin-top: .6rem; }
+  .widget h3 { font-size: 1rem; margin: .8rem 0 .2rem; }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 102 · Program Design and Abstraction · Lesson 5</p>
+<h1>Functions Are Values; Closures Are Objects Wearing Hats</h1>
+
+<p>You pass functions around constantly — handlers, callbacks,
+<code>sort.Slice</code> comparators. The precise version: in Python a
+function is an ordinary object, created by <code>def</code> at runtime,
+assignable, storable, returnable. And when a function is created inside
+another function, it <em>closes over</em> the enclosing variables — not
+their values, the variables themselves. That distinction is this lesson's
+entire booby trap, and its superpower.</p>
+
+<h2>1. Higher-order functions as design tools</h2>
+
+<pre><code>sorted(courses, key=lambda c: c.credits)   # inject the POLICY
+records.sort(key=str.lower)                # methods are values too</code></pre>
+
+<p>A <strong>higher-order function</strong> takes or returns functions.
+The design idea underneath: separate the <em>mechanism</em> (how to sort,
+how to walk, how to retry) from the <em>policy</em> (compare how? visit
+what? give up when?), and pass the policy in. <code>map</code>,
+<code>filter</code>, and <code>reduce</code> are the canonical trio —
+transform each, keep some, combine all — and CS 420 will show you the same
+trio running across a thousand machines under the name MapReduce. In
+Python, the comprehension is usually the idiomatic spelling of map+filter;
+the concept matters more than the builtin.</p>
+
+<h2>2. Closures: captured variables, not captured values</h2>
+
+<pre><code>def make_counter():
+    count = 0
+    def increment():
+        nonlocal count      # rebinding? announce it
+        count += 1
+        return count
+    return increment</code></pre>
+
+<p>Each call to <code>make_counter()</code> mints a fresh
+<code>count</code> and a fresh <code>increment</code> holding it — private,
+persistent state with no class in sight. Two counters never interfere. Note
+<code>nonlocal</code>: CS 101 Lesson 4 taught that assignment makes a name
+local; <code>nonlocal</code> is how an inner function says "no — rebind the
+enclosing one." (Reading, or mutating a captured list, needs no
+declaration; only <em>rebinding</em> does.) A closure and an object are the
+same design atom — state plus behavior — differing mainly in how many
+behaviors share the state. One behavior: closure. Several: class.</p>
+
+<h2>3. The late-binding trap (the widget)</h2>
+
+<p>Because closures capture variables, a closure created in a loop sees the
+variable's value <em>when called</em>, not when created. Make the
+callbacks, then click them:</p>
+
+<div class="card widget" id="closure-widget">
+  <h3>buggy: capture the loop variable</h3>
+  <pre><code>callbacks = [(lambda: i) for i in range(3)]</code></pre>
+  <span id="buggy-slots"></span>
+  <h3>fixed: freeze the value with a default argument</h3>
+  <pre><code>callbacks = [(lambda i=i: i) for i in range(3)]</code></pre>
+  <span id="fixed-slots"></span>
+  <div id="closure-log"></div>
+  <p class="footnote">All three buggy callbacks share the one variable
+  <code>i</code>, which finished the loop at 2. The default argument is
+  evaluated at <em>definition</em> time, giving each lambda its own frozen
+  copy — the standard idiom for this repair.</p>
+</div>
+
+<details class="card predict">
+  <summary>Predict: def append_to(item, bucket=[]) — call it twice as
+  append_to(1) then append_to(2). What does the second call return?</summary>
+  <p><code>[1, 2]</code>. Same mechanism as the fix above, other edge of the
+  blade: the default is evaluated <em>once</em>, at definition — so every
+  default-using call shares one list. Mutable defaults are the most-reported
+  Python gotcha in existence; the idiom is <code>bucket=None</code> plus
+  <code>if bucket is None: bucket = []</code>.</p>
+</details>
+
+<h2>4. Decorators are just this, wearing syntax</h2>
+
+<pre><code>def logged(fn):
+    def wrapper(*args, **kwargs):
+        print(f"calling {fn.__name__}")
+        return fn(*args, **kwargs)
+    return wrapper
+
+@logged            # sugar for: fetch = logged(fetch)
+def fetch(url): ...</code></pre>
+
+<p>A decorator is a higher-order function applied with <code>@</code>. No
+new semantics — <code>wrapper</code> is a closure over <code>fn</code>.
+Memoization, retry, timing, auth checks: all "wrap the mechanism, keep the
+signature." Assignment a3 has you build the classics —
+<code>compose</code>, <code>memoize</code>, <code>once</code> — from bare
+closures, with the standard library's versions banned by AST inspection,
+because you should build each of these once in your life before being
+allowed to import them forever after.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: the late-binding
+loop, independent counter state, and key functions for sorting. Predict
+first, then <code>uni grade 102/explore-05</code>.</p>
+<p><strong>Assignment a3 — Functional Tools</strong> is now open:
+<code>uni grade 102/a3 --dry</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/reference/simple_stmts.html#nonlocal">nonlocal</a> — the one-paragraph official definition.</li>
+  <li><a href="https://docs.python.org/3/faq/programming.html#why-do-lambdas-defined-in-a-loop-with-different-values-all-return-the-same-result">The official FAQ on lambdas in loops</a> — this trap has its own FAQ entry.</li>
+  <li><a href="https://docs.python.org/3/howto/sorting.html">Sorting HOW TO</a> — key functions in depth.</li>
+</ul>
+
+<script>
+(function () {
+  const log = document.getElementById('closure-log');
+  function build(where, fix) {
+    const span = document.getElementById(where);
+    span.innerHTML = '';
+    // Deliberately reproduce Python's late binding with a shared binding:
+    let shared = { i: 0 };
+    for (let k = 0; k < 3; k++) {
+      const btn = document.createElement('button');
+      btn.className = 'madebtn';
+      btn.textContent = 'callbacks[' + k + ']()';
+      if (fix) {
+        const frozen = k; // the "default argument": per-iteration copy
+        btn.addEventListener('click', function () {
+          log.textContent = 'fixed callbacks[' + k + ']() returned ' + frozen;
+        });
+      } else {
+        btn.addEventListener('click', function () {
+          log.textContent = 'buggy callbacks[' + k + ']() returned ' + shared.i +
+            '   (the shared variable ended the loop at 2)';
+        });
+      }
+      span.appendChild(btn);
+      shared.i = k; // loop leaves the shared binding at its last value
+    }
+    shared.i = 2;
+  }
+  build('buggy-slots', false);
+  build('fixed-slots', true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+{
+  "id": "q1",
+  "title": "Quiz 1 — Contracts and Abstract Data Types (Lessons 1-2)",
+  "questions": [
+    {
+      "id": "q1-1",
+      "prompt": "A caller violates a function's precondition and gets a wrong answer back. Whose bug is it?",
+      "choices": [
+        "the implementation's — a wrong answer is always the implementation's fault",
+        "the caller's — outside its precondition, the function promises nothing",
+        "both parties', equally",
+        "the implementation's, but only because it failed to raise instead"
+      ],
+      "salt": "102.q1.1",
+      "answer_hash": "3fa1777f71b7a169c7e0798547048440283c41d36717053d49f92b0b8654a4df"
+    },
+    {
+      "id": "q1-2",
+      "prompt": "Weakening a function's precondition (accepting more inputs) makes life:",
+      "choices": [
+        "easier for callers, harder for the implementer",
+        "harder for callers, easier for the implementer",
+        "easier for both sides",
+        "harder for both sides"
+      ],
+      "salt": "102.q1.2",
+      "answer_hash": "589c921919e5e82b8dbe56c4b75831b8dd7204c81e030b0aa67f7c94c2317684"
+    },
+    {
+      "id": "q1-3",
+      "prompt": "The honest, complete postcondition for sort(items) is:",
+      "choices": [
+        "the output is in ascending order",
+        "the output has the same length as the input and is in ascending order",
+        "the output is in ascending order and is a permutation of the input",
+        "every element of the output appears somewhere in the input, in ascending order"
+      ],
+      "salt": "102.q1.3",
+      "answer_hash": "b84786a53e5ddc5a55966a4c7a08e3cd6cd7dc11e2a9a5fcca285b5ee5df23c0"
+    },
+    {
+      "id": "q1-4",
+      "prompt": "Running Python with -O does what to assert statements?",
+      "choices": [
+        "turns assertion failures into warnings",
+        "nothing — -O only affects bytecode caching",
+        "logs assertion failures instead of raising",
+        "deletes them entirely; they never execute"
+      ],
+      "salt": "102.q1.4",
+      "answer_hash": "9341dbd30314578aa7c02f8db5efb133d7e5f182dd259106d950d39d7b4d6073"
+    },
+    {
+      "id": "q1-5",
+      "prompt": "Because of -O, assert is the wrong tool for:",
+      "choices": [
+        "validating untrusted input, like user-supplied values",
+        "spot-checking a helper's precondition during development",
+        "documenting internal invariants while debugging",
+        "expressing this-should-be-impossible conditions in draft code"
+      ],
+      "salt": "102.q1.5",
+      "answer_hash": "d43cd4eb5e83a301409bf82f24d01f642c7af871d3a2f57b6f2fc5a58cb20459"
+    },
+    {
+      "id": "q1-6",
+      "prompt": "What defines an abstract data type?",
+      "choices": [
+        "the data structure chosen to store its elements",
+        "its operations and their contracts, with the representation hidden",
+        "an abstract base class that implementations inherit from",
+        "the type annotations on its methods"
+      ],
+      "salt": "102.q1.6",
+      "answer_hash": "cbe85fea7108f898a9f7099c921a00934d2f01108722c060d9bb35014d0213d9"
+    },
+    {
+      "id": "q1-7",
+      "prompt": "A client function works with ArrayStack but crashes with LinkedStack. The most likely design diagnosis:",
+      "choices": [
+        "LinkedStack is an invalid implementation of the stack ADT",
+        "the stack ADT can only support one implementation at a time",
+        "the client should use isinstance to select a code path per implementation",
+        "the client depends on the representation instead of the interface"
+      ],
+      "salt": "102.q1.7",
+      "answer_hash": "abad658e9c44dbf9e0b135ef893dcd794f6a546526a9fbb5f3f1691c038907a9"
+    },
+    {
+      "id": "q1-8",
+      "prompt": "Duck typing means Python checks:",
+      "choices": [
+        "at object creation, that all interface methods exist",
+        "at import time, that classes declare the interfaces they satisfy",
+        "at each call, whether the receiver has the requested method — and no sooner",
+        "at call time, that the receiver inherits from the expected base class"
+      ],
+      "salt": "102.q1.8",
+      "answer_hash": "78724552ef6f03fa28eae6367d710853d18b9c581d3a313721bebada950f368f"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "id": "q4",
+  "title": "Quiz 4 — Testing, Laziness, and Shape (Lessons 7-9)",
+  "questions": [
+    {
+      "id": "q4-1",
+      "prompt": "Arrange, Act, Assert structures each test as:",
+      "choices": [
+        "three assertions minimum, one per section",
+        "setup shared by the whole suite, then a sequence of related actions",
+        "build one world, perform ONE behavior, check its postcondition",
+        "act first, then arrange the expected output for comparison"
+      ],
+      "salt": "102.q4.1",
+      "answer_hash": "af2394899dd99bbd585d3611a249ecd08f63242eb66c917560ba61ab4434f739"
+    },
+    {
+      "id": "q4-2",
+      "prompt": "A test reads the real system clock and fails intermittently. The principled fix:",
+      "choices": [
+        "auto-rerun flaky tests and accept the majority verdict",
+        "make the clock a parameter; production passes the real one, tests pass a fake",
+        "add margin — sleep long enough that timing always settles",
+        "widen the assertions until any timing passes"
+      ],
+      "salt": "102.q4.2",
+      "answer_hash": "b2ceddacf5388def1139c7153edefabc3d02cfb1fd43f457636965f753742417"
+    },
+    {
+      "id": "q4-3",
+      "prompt": "The difference between a fake and a mock:",
+      "choices": [
+        "a fake is a cheap working implementation; a mock verifies that expected calls happened",
+        "they are two names for the same thing",
+        "a mock is suitable for production use; a fake is not",
+        "a fake records calls for later assertions; a mock returns canned data"
+      ],
+      "salt": "102.q4.3",
+      "answer_hash": "0049989bf59fa9472e84056dfaf40061df40b8832016959c894f3933bb340a7f"
+    },
+    {
+      "id": "q4-4",
+      "prompt": "The characteristic danger of unittest.mock.Mock:",
+      "choices": [
+        "it raises AttributeError on any method you did not configure",
+        "it is too slow for large test suites",
+        "it cannot stand in for functions, only for classes",
+        "it answers everything — typos included — with a truthy Mock, so a careless test cannot fail"
+      ],
+      "salt": "102.q4.4",
+      "answer_hash": "d8a6b5c4094124027e8b50a7f0c94bb00cfc831f44916c0feddcf3724cf719bb"
+    },
+    {
+      "id": "q4-5",
+      "prompt": "A test asserting bag._counts == {\"a\": 2} is a smell because:",
+      "choices": [
+        "it welds the test to the representation; honest refactors now break tests",
+        "underscored attributes cannot be read from other modules",
+        "dict equality is unreliable across Python versions",
+        "tests should never assert equality, only types"
+      ],
+      "salt": "102.q4.5",
+      "answer_hash": "e14f38d18cd61c5c2c45ccce99688bade8ddcc1e76137092da279bd6c1325849"
+    },
+    {
+      "id": "q4-6",
+      "prompt": "The load-bearing difference between a list and an iterator:",
+      "choices": [
+        "iterators support len(); lists do not",
+        "a list can be walked any number of times; an iterator IS its own progress — one shot",
+        "lists are lazy; iterators are eager",
+        "a for loop accepts a list, but you must call iter() yourself before looping over an iterator"
+      ],
+      "salt": "102.q4.6",
+      "answer_hash": "9f2df2df79999230184576cf117ec74f035ad6e0fcd87c1d36f95dd1d8b9b9dd"
+    },
+    {
+      "id": "q4-7",
+      "prompt": "Calling a generator function:",
+      "choices": [
+        "runs the body eagerly and caches the yielded values",
+        "runs the body up to the first yield, then pauses",
+        "runs none of the body — execution starts at the first next()",
+        "starts the body concurrently in a background thread"
+      ],
+      "salt": "102.q4.7",
+      "answer_hash": "81611f9c6f99e29e86219359d3c419774ae5971d43723b3bd3e6c4473424d987"
+    },
+    {
+      "id": "q4-8",
+      "prompt": "In a well-shaped program, dependency arrows point:",
+      "choices": [
+        "from volatile details (I/O, formatting) toward the stable domain model",
+        "outward from the model to the modules that use it",
+        "both ways between any two cooperating modules",
+        "toward the modules that change most often"
+      ],
+      "salt": "102.q4.8",
+      "answer_hash": "b3a61e5c81ae5239558d069c5e0f920a81634ac01051ce88418d3e5f884072de"
+    }
+  ]
+}

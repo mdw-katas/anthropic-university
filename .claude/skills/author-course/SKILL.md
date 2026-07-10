@@ -143,8 +143,14 @@ student himself running `uni` without `--dry`).
 3. **Red check**: `./bin/uni grade 101/<item> --dry` on the untouched
    starter must report a clean run ("Ran N tests") with a low/zero score —
    not an import error.
-4. **Quiz keys**: `printf 'b\na\n...' | ./bin/uni quiz NNN/qX --dry` with
-   the correct key → exactly 100%; then once with a wrong key → below 100%.
+4. **Quiz keys**: choices are shuffled per run (time-seeded), so piped
+   letters can no longer prove the key. Instead, verify each stored
+   `answer_hash` equals the hash of the intended ORIGINAL letter — either
+   `./bin/uni hash <salt> <letter>` per question, or one scripted pass of
+   `sha256(salt + ":" + letter)` over the JSON — confirming exactly one
+   letter in a–d matches and it is within the choice count. Then one
+   piped smoke run (`printf 'a\n...' | ./bin/uni quiz NNN/qX --dry`) to
+   prove the quiz administers end to end.
 5. Update `course.json` (study order!); `./bin/uni status NNN` and
    `./bin/uni next` must render sanely.
 6. Re-read your own README/lesson as the student: is any test's behavior

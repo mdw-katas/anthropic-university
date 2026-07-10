@@ -1,0 +1,102 @@
+{
+  "id": "q2",
+  "title": "Quiz 2 — Classes, Invariants, and Dispatch (Lessons 3-4)",
+  "questions": [
+    {
+      "id": "q2-1",
+      "prompt": "A representation invariant is:",
+      "choices": [
+        "a condition the type checker enforces about attribute types",
+        "a condition that holds right after construction but may lapse afterward",
+        "a condition on internal state: established by the constructor, preserved by every method, assumed by each on entry",
+        "an assertion clients must check before calling each method"
+      ],
+      "salt": "102.q2.1",
+      "answer_hash": "e4e690ecfb4e13f284a9c94d5b537a9f73da9010f6e9e7d544832db4943a3f90"
+    },
+    {
+      "id": "q2-2",
+      "prompt": "class Team: members = [] — two instances each call self.members.append(...). The result:",
+      "choices": [
+        "one shared list on the class: both instances (and all future ones) see every append",
+        "each instance silently gets its own list on first append",
+        "AttributeError — instances cannot reach class attributes",
+        "the second instance's append raises, because the list belongs to the first"
+      ],
+      "salt": "102.q2.2",
+      "answer_hash": "35368a474cac7c91c141b6ee892e7e57e508ec585bed6267a296ac7d0312126a"
+    },
+    {
+      "id": "q2-3",
+      "prompt": "Define __eq__ on a class and leave __hash__ undefined. Your instances:",
+      "choices": [
+        "hash by identity, as before",
+        "hash by value automatically",
+        "work as dict keys but compare by identity inside the dict",
+        "become unhashable — using one as a dict key raises TypeError"
+      ],
+      "salt": "102.q2.3",
+      "answer_hash": "aea02b0a69a3df7b71056d9f7d24bd711ab8b31bba6a70a762f85cc0ef49a096"
+    },
+    {
+      "id": "q2-4",
+      "prompt": "Name mangling (a __double_underscore attribute) exists to:",
+      "choices": [
+        "make attributes unreachable from outside the class",
+        "prevent accidental attribute collisions in subclasses — not to keep secrets",
+        "mark attributes as eligible for garbage collection sooner",
+        "speed up attribute lookup on hot paths"
+      ],
+      "salt": "102.q2.4",
+      "answer_hash": "27b5c8c5ffe86c350e35a5dc518337889b0d8a23900ceea494ffe23e09c96f30"
+    },
+    {
+      "id": "q2-5",
+      "prompt": "Dynamic dispatch means the method that runs is chosen by:",
+      "choices": [
+        "the runtime type of the receiver, at the moment of the call",
+        "the type declared or implied at the call site",
+        "the order in which the candidate classes were defined",
+        "the first isinstance check that matches"
+      ],
+      "salt": "102.q2.5",
+      "answer_hash": "e47a8d7a2d4b9e9fc197580b901f6cfe0864cb01772793bff78a5da2d3050459"
+    },
+    {
+      "id": "q2-6",
+      "prompt": "Square(Rectangle) violates substitutability because:",
+      "choices": [
+        "a square is not a rectangle, mathematically",
+        "Python forbids overriding inherited setters",
+        "Rectangle's contract lets width and height vary independently, and Square cannot honor that",
+        "Square fails to add any new behavior of its own"
+      ],
+      "salt": "102.q2.6",
+      "answer_hash": "fd0cd01dbc6e8c194c088d25e2050c8c9a34075defa5476b37bc660e32ce0491"
+    },
+    {
+      "id": "q2-7",
+      "prompt": "LoggingDict(dict) overrides __setitem__ to log writes. LoggingDict(a=1), then d[\"b\"] = 2, then d.update(c=3). How many writes were logged?",
+      "choices": [
+        "3",
+        "1 — the constructor and update write through internal paths that skip the override",
+        "2 — only the constructor bypasses the override",
+        "0 — dict never dispatches to subclass methods"
+      ],
+      "salt": "102.q2.7",
+      "answer_hash": "0d42504b0c1297361c0715eade7484af17cbe12c7d088e6c9ee9cfc86e4a0441"
+    },
+    {
+      "id": "q2-8",
+      "prompt": "super() refers to:",
+      "choices": [
+        "the immediate parent of the class where it appears, always",
+        "the first base class listed in the class statement",
+        "object",
+        "the next class in the instance's MRO — which need not be the parent"
+      ],
+      "salt": "102.q2.8",
+      "answer_hash": "ac6c26b503a0a8d2b88b904a35d5707da1b6b58f74f2952549911bfc2d160fe8"
+    }
+  ]
+}

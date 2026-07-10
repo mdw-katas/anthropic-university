@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 102 · Lesson 4 — Inheritance, Composition, Dispatch</title>
+<style>
+  :root {
+    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #5a5a5a; --accent: #0b6e4f;
+    --card: #f0f0ea; --border: #d8d8d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e4de; --muted: #a0a098; --accent: #52b788;
+      --card: #1e2127; --border: #33363d;
+    }
+  }
+  body {
+    margin: 0 auto; max-width: 46rem; padding: 2rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 1.05rem/1.65 Georgia, 'Times New Roman', serif;
+  }
+  h1, h2, h3 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif; line-height: 1.25; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.3rem; margin-top: 2.5rem; }
+  .kicker { color: var(--muted); font-family: -apple-system, sans-serif; font-size: .85rem;
+            text-transform: uppercase; letter-spacing: .08em; }
+  code, pre { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .9em; }
+  code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+        padding: 1rem; overflow-x: auto; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  details.predict { border-left: 4px solid var(--accent); }
+  details.predict summary { cursor: pointer; font-weight: 600;
+          font-family: -apple-system, sans-serif; }
+  .widget button, .widget input {
+    font: inherit; font-family: -apple-system, sans-serif;
+  }
+  .widget button {
+    cursor: pointer; background: var(--accent); color: var(--bg);
+    border: none; border-radius: 6px; padding: .4rem 1rem; margin: .2rem .3rem .2rem 0;
+  }
+  .widget button.secondary { background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); }
+  .widget input { background: var(--bg); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: .35rem .5rem; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: .4rem .8rem; text-align: left; }
+  th { font-family: -apple-system, sans-serif; }
+  .footnote { color: var(--muted); font-size: .9rem; }
+  /* ---- widget-specific styles go below this line ---- */
+  #mro-walk { font-family: ui-monospace, Menlo, monospace; font-size: .88rem;
+    white-space: pre-wrap; margin-top: .6rem; }
+  .mro-hit { color: var(--accent); font-weight: 700; }
+  .mro-skip { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<p class="kicker">CS 102 · Program Design and Abstraction · Lesson 4</p>
+<h1>Inheritance Is a Contract, Composition Is a Part</h1>
+
+<p>Object-oriented design has one genuinely magic trick —
+<strong>dynamic dispatch</strong> — and two ways to reuse code, one of which
+is oversold. This lesson names the trick precisely, shows exactly how Python
+performs it, and gives you principled reasons (not slogans) for the advice
+you have been nodding along to for years: <em>favor composition over
+inheritance</em>.</p>
+
+<h2>1. Dynamic dispatch, precisely</h2>
+
+<p>When Python executes <code>obj.describe()</code>, the method that runs is
+chosen at <em>call time</em> by the <em>runtime type</em> of
+<code>obj</code> — not by anything visible at the call site. The call site
+names a message; the receiver supplies the meaning. That late choice is
+polymorphism's whole mechanism, and it is the reason old code can call new
+code: a function written last year, dispatching on <code>describe()</code>,
+runs a class you write today. (Go does this only through interface values;
+Python does it on every attribute access.)</p>
+
+<h2>2. Method lookup: the MRO (the widget)</h2>
+
+<p>Inheritance adds a search path. Python linearizes the class hierarchy
+into a <strong>Method Resolution Order</strong> and walks it until a class
+supplies the method. Pick an instance and a method; watch the walk:</p>
+
+<div class="card widget" id="mro-widget">
+  <pre><code>class Animal:            speak, name
+class Dog(Animal):       speak
+class Puppy(Dog):        name
+class Robot:             speak
+class RoboDog(Dog, Robot):   (defines nothing)</code></pre>
+  <button data-call="Puppy.speak">Puppy().speak()</button>
+  <button data-call="Puppy.name">Puppy().name()</button>
+  <button data-call="RoboDog.speak">RoboDog().speak()</button>
+  <button data-call="Dog.name">Dog().name()</button>
+  <div id="mro-walk"></div>
+  <p class="footnote">RoboDog's MRO is RoboDog, Dog, Animal, Robot — bases
+  are searched depth-first-ish, left to right, each class exactly once
+  (C3 linearization). Note Robot.speak never wins: Dog got there first.
+  <code>super()</code> means "the next class in the MRO," not "my
+  parent" — which is why cooperative <code>super().__init__()</code> chains
+  work even in diamonds.</p>
+</div>
+
+<h2>3. When inheritance is the wrong tool</h2>
+
+<p><strong>Substitutability is the real rule.</strong> <code>Sub</code> may
+inherit from <code>Base</code> only if every place that works with a
+<code>Base</code> works — contract intact — with a <code>Sub</code>. In
+Lesson 1's vocabulary: an override may weaken preconditions or strengthen
+postconditions, never the reverse. This is the Liskov Substitution
+Principle, and the canonical corpse is <code>Square(Rectangle)</code>:
+mathematically a square <em>is-a</em> rectangle, but a rectangle's contract
+says width and height vary independently, and Square cannot honor it. The
+exploration lets you watch a perfectly innocent function get wrong answers
+from a Square it was promised was a Rectangle.</p>
+
+<p><strong>The fragile base class.</strong> Inheriting an implementation
+couples you to its private choices. Subclass <code>dict</code>, override
+<code>__setitem__</code>, and discover that <code>__init__</code> and
+<code>update</code> never call your override — CPython's builtins call each
+other internally without dispatching through subclass methods. Your
+"logging dict" logs some writes. The exploration makes you predict how
+many.</p>
+
+<h2>4. Composition: the boring technique that keeps working</h2>
+
+<pre><code>class LoggingDict:
+    """HAS a dict; IS not a dict."""
+    def __init__(self):
+        self._store = {}
+        self.log = []
+    def __setitem__(self, key, value):
+        self.log.append(key)
+        self._store[key] = value
+    def __getitem__(self, key):
+        return self._store[key]</code></pre>
+
+<p>The wrapper cannot be bypassed, because the inner dict is reachable only
+through it — the fence from Lesson 3 again. You couple to the dict's
+<em>public contract</em> instead of its internals, and you expose only the
+operations you actually support. The cost is delegation boilerplate; the
+benefit is that nothing you didn't write can surprise you. Rule of thumb
+worth its cliché status: inherit an <em>interface</em> (an abstract
+"is-usable-as"), compose an <em>implementation</em> (a concrete
+"is-built-from").</p>
+
+<details class="card predict">
+  <summary>Predict: LoggingDict(dict) overrides __setitem__ to log. Then
+  LoggingDict(a=1) followed by d["b"] = 2 followed by d.update(c=3).
+  How many writes were logged?</summary>
+  <p>One. Only the explicit <code>d["b"] = 2</code> travels through your
+  override; the constructor and <code>update</code> write through internal C
+  paths. If you need a mapping that reliably intercepts writes, either
+  compose, or subclass <code>collections.UserDict</code> — a class that
+  exists precisely because of this trap.</p>
+</details>
+
+<h2>5. Polymorphism without hierarchy</h2>
+
+<p>Here is the punchline for assignment a2: dispatch does not require
+inheritance at all. Any object with the right methods participates —
+Lesson 2's duck typing — so a "hierarchy" in Python is often just a set of
+unrelated classes agreeing on a protocol. Code that type-switches
+(<code>if isinstance(node, Add): ...</code>) forfeits the magic: it must be
+edited for every new type. Code that dispatches (<code>node.evaluate(env)</code>)
+is <em>open to extension and closed to modification</em> — new types plug
+into old code with zero edits. a2's test suite enforces this by injecting a
+node type you have never seen into your expression tree. Design
+accordingly.</p>
+
+<h2>Now go interact</h2>
+
+<div class="card">
+<p><strong>Explorations</strong> — <code>explore/</code>: a diamond MRO to
+trace, the dict-subclass bypass to count, and Square v. Rectangle in front
+of a jury. Predict first, then <code>uni grade 102/explore-04</code>.</p>
+<p><strong>Quiz 2 — Classes, Invariants, and Dispatch</strong> is now open:
+<code>uni quiz 102/q2</code>. Then <strong>assignment a2 —
+Expressions</strong>: polymorphic dispatch with <code>isinstance</code>
+banned by AST inspection. <code>uni grade 102/a2 --dry</code>.</p>
+</div>
+
+<h2>Further reading (reputable, optional)</h2>
+<ul>
+  <li><a href="https://docs.python.org/3/tutorial/classes.html#inheritance">Inheritance</a> — the tutorial chapter, including multiple inheritance.</li>
+  <li><a href="https://docs.python.org/3/library/functions.html#super">super()</a> — "next in MRO," in the official words.</li>
+  <li><a href="https://docs.python.org/3/library/collections.html#collections.UserDict">UserDict</a> — the class that exists because subclassing dict is fragile.</li>
+</ul>
+
+<script>
+(function () {
+  const hierarchy = {
+    Puppy: ['Puppy', 'Dog', 'Animal', 'object'],
+    Dog: ['Dog', 'Animal', 'object'],
+    RoboDog: ['RoboDog', 'Dog', 'Animal', 'Robot', 'object'],
+  };
+  const defines = {
+    Animal: ['speak', 'name'],
+    Dog: ['speak'],
+    Puppy: ['name'],
+    Robot: ['speak'],
+    RoboDog: [],
+    object: [],
+  };
+  const walk = document.getElementById('mro-walk');
+  document.querySelectorAll('#mro-widget button').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const parts = button.getAttribute('data-call').split('.');
+      const cls = parts[0], method = parts[1];
+      const mro = hierarchy[cls];
+      let lines = ['MRO of ' + cls + ': ' + mro.join(' -> '), ''];
+      let found = false;
+      for (const stop of mro) {
+        if (!found && defines[stop].indexOf(method) >= 0) {
+          lines.push('  ' + stop + '.' + method + '   <- FOUND: this one runs');
+          found = true;
+        } else if (!found) {
+          lines.push('  ' + stop + '.' + method + '   (not defined here, keep walking)');
+        }
+      }
+      if (!found) lines.push('  AttributeError: no class in the MRO defines ' + method);
+      walk.textContent = lines.join('\n');
+    });
+  });
+})();
+</script>
+</body>
+</html>
