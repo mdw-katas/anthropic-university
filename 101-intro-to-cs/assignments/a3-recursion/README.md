@@ -19,7 +19,7 @@ Notes:
   the test rejects a solution that recurses 1000 deep on `power(2, 1000)`
   by watching the recursion depth. Think: `power(b, 10) == power(b*b, 5)`.
 - `flatten([1, [2, [3, [4]]], 5])` is `[1, 2, 3, 4, 5]`. An element is a
-  sub-list iff `isinstance(element, list)`.
+  sub-list if `isinstance(element, list)`.
 - `hanoi` returns moves as `(from_peg, to_peg)` tuples. Trust the contract:
   move n-1 out of the way, move the big one, move n-1 back on top.
 
