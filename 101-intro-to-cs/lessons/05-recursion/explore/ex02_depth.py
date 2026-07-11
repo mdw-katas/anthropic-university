@@ -5,7 +5,7 @@ factorial frames alive at the deepest moment. Predict, run, then:
 uni grade 101/explore-05
 """
 
-PREDICT_MAX_DEPTH = None  # deepest simultaneous factorial frames, n=5
+PREDICT_MAX_DEPTH = 6  # deepest simultaneous factorial frames, n=5
 
 
 def factorial_max_depth(n):

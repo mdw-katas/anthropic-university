@@ -5,7 +5,7 @@ string, and ask what the top-level call assembles. Predict, run, then:
 uni grade 101/explore-05
 """
 
-PREDICT_REVERSED = None  # reverse("stack")
+PREDICT_REVERSED = "kcats"  # reverse("stack")
 
 
 def reverse(s):

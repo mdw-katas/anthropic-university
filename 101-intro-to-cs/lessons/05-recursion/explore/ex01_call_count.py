@@ -5,8 +5,8 @@ Work out fib(5)'s totals on paper (the lesson's widget agrees with you),
 run this file, then: uni grade 101/explore-05
 """
 
-PREDICT_VALUE_FOR_5 = None
-PREDICT_CALLS_FOR_5 = None
+PREDICT_VALUE_FOR_5 = 5
+PREDICT_CALLS_FOR_5 = 15
 
 
 def fib_counting(n):
