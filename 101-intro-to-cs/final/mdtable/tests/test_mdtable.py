@@ -102,14 +102,23 @@ class TestFormatTable(unittest.TestCase):
 
 
 class TestFormatDocument(unittest.TestCase):
+    def test_table_only(self):
+        text = "| a | b |\n|---|---|\n| 1 | 22 |"
+        self.assertEqual(mdtable.format_document(text),
+                         "| a   | b   |\n"
+                         "|-----|-----|\n"
+                         "| 1   | 22  |")
+
     def test_formats_table_leaves_prose(self):
         text = "Intro prose.\n\n| a | b |\n|---|---|\n| 1 | 22 |\n\nOutro."
         self.assertEqual(mdtable.format_document(text),
-                         "Intro prose.\n\n"
+                         "Intro prose.\n"
+                         "\n"
                          "| a   | b   |\n"
                          "|-----|-----|\n"
                          "| 1   | 22  |\n"
-                         "\nOutro.")
+                         "\n"
+                         "Outro.")
 
     def test_fenced_code_blocks_untouched(self):
         text = "```\n| not | a | table |\n|---|---|---|\n```\n"
