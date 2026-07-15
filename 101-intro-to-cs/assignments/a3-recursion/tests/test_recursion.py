@@ -67,9 +67,12 @@ class TestFlatten(unittest.TestCase):
 
 class TestPascalRow(unittest.TestCase):
     def test_first_rows(self):
-        self.assertEqual(recursion.pascal_row(0), [1])
-        self.assertEqual(recursion.pascal_row(1), [1, 1])
-        self.assertEqual(recursion.pascal_row(4), [1, 4, 6, 4, 1])
+        self.assertEqual(recursion.pascal_row(0),      [1])
+        self.assertEqual(recursion.pascal_row(1),     [1, 1])
+        self.assertEqual(recursion.pascal_row(2),    [1, 2, 1])
+        self.assertEqual(recursion.pascal_row(3),   [1, 3, 3, 1])
+        self.assertEqual(recursion.pascal_row(4),  [1, 4, 6, 4, 1])
+        self.assertEqual(recursion.pascal_row(5), [1, 5,10,10, 5, 1])
 
     def test_row_sums_are_powers_of_two(self):
         self.assertEqual(sum(recursion.pascal_row(10)), 1024)
