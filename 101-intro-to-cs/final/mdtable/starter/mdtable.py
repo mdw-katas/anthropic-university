@@ -11,7 +11,12 @@ def split_row(line):
     """Strip the line, drop one leading and one trailing '|' if present,
     split on '|', and strip each cell. Returns a list of cell strings.
     """
-    return [x.strip() for x in line.strip().strip('|').split('|')]
+    line = line.strip()
+    if line.startswith('|'):
+        line = line[1:]
+    if line.endswith('|'):
+        line = line[:-1]
+    return [x.strip() for x in line.split('|')]
 
 
 def is_separator(line):
@@ -21,10 +26,22 @@ def is_separator(line):
         return False
     if not line.endswith('|'):
         return False
-    if not set(line).issubset({':', '-', '|', ' '}):
-        return False
-    return any(True for field in line.strip('|').split('|') 
-        if re.match(':?-+:?', field.strip()))
+
+    fields = line[1:-1].split('|')
+    for field in fields:
+        field = field.strip()
+        start = 0
+        end = len(field)
+        if start == end:
+            return False
+        if field.startswith(':'):
+            start += 1
+        if field.endswith(':'):
+            end -= 1
+        for c in field[start:end]:
+            if c != '-':
+                return False
+    return True
 
 
 def alignment(cell):
@@ -43,7 +60,8 @@ def column_widths(rows):
     return each column's width: the longest cell in it, minimum 3.
     Rows may be ragged; missing cells count as "".
     """
-    max_lengths = [3 for _ in range(len(rows[0]))]
+    max_row_count = max([len(row) for row in rows])
+    max_lengths = [3 for _ in range(max_row_count)]
     for row in rows:
         for n, field in enumerate(row):
             if n >= len(max_lengths):
@@ -87,7 +105,7 @@ def format_table(lines):
     as '| cell |' with single spaces. Separator cells span width + 2
     characters using dashes and their alignment colons. Idempotent.
     """
-    if len(lines) <= 2:
+    if len(lines) < 2:
         return lines
     if not is_separator(lines[1]):
         return lines
