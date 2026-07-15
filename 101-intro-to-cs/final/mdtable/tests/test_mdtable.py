@@ -18,6 +18,9 @@ class TestSplitRow(unittest.TestCase):
     def test_empty_cells_survive(self):
         self.assertEqual(mdtable.split_row("| a |  | c |"), ["a", "", "c"])
 
+    def test_only_one_outer_pipe_removed(self):
+        self.assertEqual(mdtable.split_row("|| a ||"), ["", "a", ""])
+
     def test_surrounding_whitespace(self):
         self.assertEqual(mdtable.split_row("   | x |   "), ["x"])
 
@@ -33,6 +36,13 @@ class TestIsSeparator(unittest.TestCase):
         self.assertFalse(mdtable.is_separator("just text"))
         self.assertFalse(mdtable.is_separator(""))
         self.assertFalse(mdtable.is_separator("|--x--|"))
+
+    def test_all_separator_cells_must_match(self):
+        self.assertFalse(mdtable.is_separator("|---||"))
+        self.assertFalse(mdtable.is_separator("|---|abc|"))
+
+    def test_separator_cells_must_match_completely(self):
+        self.assertFalse(mdtable.is_separator("|---|--::|"))
 
 
 class TestAlignment(unittest.TestCase):
@@ -54,6 +64,10 @@ class TestColumnWidths(unittest.TestCase):
     def test_ragged_rows(self):
         rows = [["alpha", "b"], ["1"]]
         self.assertEqual(mdtable.column_widths(rows), [5, 3])
+
+    def test_later_rows_can_add_columns(self):
+        rows = [["a"], ["1", "longer"]]
+        self.assertEqual(mdtable.column_widths(rows), [3, 6])
 
 
 class TestFormatTable(unittest.TestCase):
@@ -89,6 +103,21 @@ class TestFormatTable(unittest.TestCase):
             "| a   | b   |",
             "|-----|-----|",
             "| 1   |     |",
+        ])
+
+    def test_two_line_table_is_formatted(self):
+        lines = ["| a | b |", "|---|---|"]
+        self.assertEqual(mdtable.format_table(lines), [
+            "| a   | b   |",
+            "|-----|-----|",
+        ])
+
+    def test_body_can_add_columns(self):
+        lines = ["| a |", "|---|---|", "| 1 | longer |"]
+        self.assertEqual(mdtable.format_table(lines), [
+            "| a   |        |",
+            "|-----|--------|",
+            "| 1   | longer |",
         ])
 
     def test_idempotent(self):

@@ -55,5 +55,5 @@ uni grade 101/final --dry
 uni grade 101/final
 ```
 
-19 tests; pass bar 80%, best score kept, like everything else — but this is
+26 tests; pass bar 80%, best score kept, like everything else — but this is
 the final. Go get 100%.
